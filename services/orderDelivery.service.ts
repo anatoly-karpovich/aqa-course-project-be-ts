@@ -15,9 +15,8 @@ class OrderDeliveryService {
     };
     const updatedOrder = await Order.findByIdAndUpdate(newOrder._id, newOrder, { new: true });
     const customer = await CustomerService.getCustomer(updatedOrder.customer);
-    const requestedProducts = await Promise.all(updatedOrder.requestedProducts.map(async (id) => (await ProductsService.getProduct(id))._doc));
-    const receivedProducts = await Promise.all(updatedOrder.receivedProducts.map(async (id) => (await ProductsService.getProduct(id))._doc));
-    return { ...updatedOrder._doc, customer, requestedProducts, receivedProducts };
+    
+    return { ...updatedOrder._doc, customer };
   }
 }
 

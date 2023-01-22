@@ -67,6 +67,10 @@ export async function orderStatus(req: Request, res: Response, next: NextFunctio
     if(status === "Canceled" && (order.status !== 'Draft' && order.status !== 'In Process')) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: `'${status}' is not a valid status` });
     }
+
+    if(status === "In Process" && !order.delivery) {
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: `Can't process order. Please, shedule delivery` });
+    }
     next();
   } catch (e) {
     console.log(e);

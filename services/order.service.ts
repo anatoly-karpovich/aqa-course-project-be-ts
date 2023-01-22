@@ -1,28 +1,27 @@
 import Order from "../models/order.model";
 import CustomerService from "./customer.service";
 import ProductsService from "./products.service";
-import { IOrder, IOrderResponse } from "../data/types/order.type";
+import { IOrder, IOrderRequest, IOrderResponse } from "../data/types/order.type";
 import { Types } from "mongoose";
 import { getTotalPrice } from "../utils/utils";
 import { ORDER_STATUSES } from "../data/enums";
 
 class OrderService {
-  async create(order: IOrder): Promise<IOrderResponse> {
-    const rp = await Promise.all(order.requestedProducts.map(async (id) => (await ProductsService.getProduct(id))._doc));
-    const newOrder = {
-      status: ORDER_STATUSES.DRAFT,
-      customer: order.customer,
-      requestedProducts: [...order.requestedProducts],
-      delivery: order.delivery || null,
-      total_price: getTotalPrice(rp),
-      createdOn: new Date().toISOString()
-    };
-    const createdOrder: IOrder = await Order.create(newOrder);
-    const customer = await CustomerService.getCustomer(createdOrder.customer);
-    const requestedProducts = await Promise.all(createdOrder.requestedProducts.map(async (id) => (await ProductsService.getProduct(id))._doc));
-    const orderData = Object.assign(createdOrder._doc);
-    return { ...orderData, customer, requestedProducts };
-  }
+  async create(order: IOrderRequest): Promise<IOrderResponse> {
+      const requestedProducts = await Promise.all(order.requestedProducts.map(async (id) => (await ProductsService.getProduct(id))._doc));
+      const newOrder = {
+        status: ORDER_STATUSES.DRAFT,
+        customer: order.customer,
+        requestedProducts,
+        delivery: order.delivery || null,
+        total_price: getTotalPrice(requestedProducts),
+        createdOn: new Date().toISOString()
+      };    
+      const createdOrder = await Order.create(newOrder);
+      const customer = await CustomerService.getCustomer(createdOrder.customer);
+      const orderData = Object.assign(createdOrder._doc);
+      return { ...orderData, customer };
+    }
 
   async getAll(): Promise<IOrderResponse[]> {
     const ordersFromDB = await Order.find();
@@ -30,8 +29,6 @@ class OrderService {
       return {
         ...order._doc,
         customer: await CustomerService.getCustomer(order.customer),
-        requestedProducts: await Promise.all(order.requestedProducts.map(async (id) => (await ProductsService.getProduct(id))._doc)),
-        receivedProducts: await Promise.all(order.receivedProducts.map(async (id) => (await ProductsService.getProduct(id))._doc)),
       };
     });
     return Promise.all(orders);
@@ -46,28 +43,23 @@ class OrderService {
       return undefined;
     }
     const customer = await CustomerService.getCustomer(orderFromDB.customer);
-    const requestedProducts = await Promise.all(orderFromDB.requestedProducts.map(async (id) => (await ProductsService.getProduct(id))._doc));
-    const receivedProducts = await Promise.all(orderFromDB.receivedProducts.map(async (id) => (await ProductsService.getProduct(id))._doc));
-    return { ...orderFromDB._doc, customer, requestedProducts, receivedProducts };
+    return { ...orderFromDB._doc, customer };
   }
 
-  async update(order: IOrder): Promise<IOrderResponse> {
+  async update(order: IOrderRequest): Promise<IOrderResponse> {
     if (!order._id) {
       throw new Error("Id was not provided");
     }
-    const rp = await Promise.all(order.requestedProducts.map(async (id) => (await ProductsService.getProduct(id))._doc));
+    const requestedProducts = await Promise.all(order.requestedProducts.map(async (id) => (await ProductsService.getProduct(id))._doc));
     const newOrder = {
       status: ORDER_STATUSES.DRAFT,
       customer: order.customer,
-      requestedProducts: [...order.requestedProducts],
-      delivery: order.delivery,
-      total_price: getTotalPrice(rp),
-    } as IOrder;
+      requestedProducts,
+      total_price: getTotalPrice(requestedProducts),
+    } as Omit<IOrder, "createdOn" | "delivery">
     const updatedOrder = await Order.findByIdAndUpdate(order._id, newOrder, { new: true });
     const customer = await CustomerService.getCustomer(updatedOrder.customer);
-    const requestedProducts = await Promise.all(updatedOrder.requestedProducts.map(async (id) => (await ProductsService.getProduct(id))._doc));
-    const receivedProducts = await Promise.all(updatedOrder.receivedProducts.map(async (id) => (await ProductsService.getProduct(id))._doc));
-    return { ...updatedOrder._doc, customer, requestedProducts, receivedProducts };
+    return { ...updatedOrder._doc, customer };
   }
 
   async delete(id: Types.ObjectId): Promise<IOrder> {

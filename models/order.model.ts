@@ -2,6 +2,15 @@ import mongoose from "mongoose";
 import { DELIVERY } from "../data/enums";
 import { IOrder } from "../data/types/order.type";
 
+const product = new mongoose.Schema({
+  _id: { type: mongoose.SchemaTypes.ObjectId },
+  name: {type: String, required: true},
+  amount: {type: Number, required: true},
+  price: {type: Number, required: true},
+  manufacturer: {type: String, required: true },
+  notes: {type: String, required: false },
+}, {_id: false})
+
 const delivery = new mongoose.Schema({
   finalDate: { type: Date, required: true },
   condition: { type: String, enum: DELIVERY, required: true },
@@ -15,8 +24,8 @@ const delivery = new mongoose.Schema({
 const history = new mongoose.Schema({ 
   status: { type: String, required: true },
   customer: { type: mongoose.SchemaTypes.ObjectId, ref: "Customer", required: true },
-  requestedProducts: [{ type: mongoose.SchemaTypes.ObjectId, ref: "Product", required: true }],
-  receivedProducts: [{ type: mongoose.SchemaTypes.ObjectId, ref: "Product", required: true }],
+  requestedProducts: [{ type: product, required: true }],
+  receivedProducts: [{ type: product, required: true }],
   delivery: { type: delivery, required: false },
   changedOn: { type: Date, required: true }
  }, {_id: false})
@@ -25,8 +34,8 @@ const history = new mongoose.Schema({
 const Order = new mongoose.Schema({
   status: { type: String, required: true },
   customer: { type: mongoose.SchemaTypes.ObjectId, ref: "Customer", required: true },
-  requestedProducts: [{ type: mongoose.SchemaTypes.ObjectId, ref: "Product", required: true }],
-  receivedProducts: [{ type: mongoose.SchemaTypes.ObjectId, ref: "Product", required: true }],
+  requestedProducts: [{ type: product, required: true }],
+  receivedProducts: [{ type: product, required: true }],
   delivery: { type: delivery, required: false },
   total_price: { type: Number, require: true },
   createdOn: { type: Date, required: true }
