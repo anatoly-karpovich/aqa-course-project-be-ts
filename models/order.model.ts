@@ -35,6 +35,7 @@ const Order = new mongoose.Schema({
   status: { type: String, required: true },
   customer: { type: mongoose.SchemaTypes.ObjectId, ref: "Customer", required: true },
   requestedProducts: [{ type: product, required: true }],
+  notReceivedProducts: [{ type: product, required: true }],
   receivedProducts: [{ type: product, required: true }],
   delivery: { type: delivery, required: false },
   total_price: { type: Number, require: true },

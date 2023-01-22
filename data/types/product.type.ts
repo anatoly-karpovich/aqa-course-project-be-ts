@@ -7,6 +7,6 @@ export interface IProduct extends mongoose.Document, DocumentResult<IProduct>{
     name: string,
     amount: number,
     price: number,
-    manufacturer: {type: String, enum: MANUFACTURER, required: true },
-    notes?: {type: String, required: false },
+    manufacturer:  MANUFACTURER,
+    notes?: string
 }

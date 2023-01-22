@@ -13,7 +13,7 @@ export async function customerValidations(req: Request, res: Response, next: Nex
     }
 
     if ((await CustomerService.getAll()).find((c) => c.email === req.body.email)) {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: `Customer with email '${req.body.email}' already exists` });
+      return res.status(409).json({ IsSuccess: false, ErrorMessage: `Customer with email '${req.body.email}' already exists` });
     }
 
     if (!isValidInput("Name", req.body.name) || (req.body.name && req.body.name.trim().length !== req.body.name.length)) {

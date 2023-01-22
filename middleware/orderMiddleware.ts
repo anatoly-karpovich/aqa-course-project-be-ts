@@ -20,11 +20,14 @@ export async function orderById(req: Request, res: Response, next: NextFunction)
 
 export async function orderValidations(req: Request, res: Response, next: NextFunction) {
   if(!req.body.customer) {
-    return res.status(404).json({ IsSuccess: false, ErrorMessage: `Missing 'customer' key` });
+    return res.status(404).json({ IsSuccess: false, ErrorMessage: `Missing customer` });
   }
 
-  if(!req.body.requestedProducts) {
-    return res.status(404).json({ IsSuccess: false, ErrorMessage:  `Missing 'requestedProducts' key` });
+  if(!req.body.requestedProducts || !req.body.requestedProducts.length) {
+    return res.status(404).json({ IsSuccess: false, ErrorMessage:  `Missing products` });
+  }
+  if(req.body.requestedProducts.length > 5) {
+    return res.status(404).json({ IsSuccess: false, ErrorMessage:  `Incorrect amount of products` });
   }
 
   try {
@@ -51,10 +54,10 @@ export async function orderStatus(req: Request, res: Response, next: NextFunctio
   try {
     const status = req.body.status;
     if (!Object.values(ORDER_STATUSES).includes(status)) {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: `'${status}' is not a valid status` });
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: `Invalid order status` });
     }
     if(status !== "In Process" && status !== "Canceled") {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: `'${status}' is not a valid status` });
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: `Invalid order status` });
     }
     const id = req.body._id || req.params.id;
     const order = await OrderService.getOrder(id);
@@ -62,14 +65,14 @@ export async function orderStatus(req: Request, res: Response, next: NextFunctio
       return res.status(404).json({ IsSuccess: false, ErrorMessage: `Order with id '${id}' wasn't found` });
     }
     if(status === "In Process" && (order.status !== 'Draft' && order.status !== 'In Process')) {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: `'${status}' is not a valid status` });
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: `Invalid order status` });
     }
     if(status === "Canceled" && (order.status !== 'Draft' && order.status !== 'In Process')) {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: `'${status}' is not a valid status` });
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: `Invalid order status` });
     }
 
     if(status === "In Process" && !order.delivery) {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: `Can't process order. Please, shedule delivery` });
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: `Can't process order. Please, schedule delivery` });
     }
     next();
   } catch (e) {
@@ -79,6 +82,7 @@ export async function orderStatus(req: Request, res: Response, next: NextFunctio
 
 export async function orderUpdateValidations(req: Request, res: Response, next: NextFunction) {
   try{
+    const id = req.body._id
     let  order = await OrderService.getOrder(req.body._id);
       if(!order)
       return res.status(404).json({ IsSuccess: false, ErrorMessage: `Order with id '${req.body._id}' wasn't found` });
@@ -99,12 +103,15 @@ export async function orderReceiveValidations(req: Request, res: Response, next:
       return res.status(404).json({ IsSuccess: false, ErrorMessage: `Order with id '${req.body._id}' wasn't found` });
     }
 
+    if(!req.body.receivedProducts.length) {
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: `Incorrect amount of received products` });
+    }
+
     if(order.status === 'Draft' || order.status === 'Received') {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: `Invalid order status` });
     }
 
-    if (req.body.receivedProducts.length > order.requestedProducts.length 
-      || [...new Set(req.body.receivedProducts)].length !== req.body.receivedProducts.length) {
+    if (req.body.receivedProducts.length > order.requestedProducts.length) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: `Incorrect amount of received products` });
     }
 

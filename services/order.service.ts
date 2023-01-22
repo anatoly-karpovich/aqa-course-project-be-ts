@@ -13,7 +13,8 @@ class OrderService {
         status: ORDER_STATUSES.DRAFT,
         customer: order.customer,
         requestedProducts,
-        delivery: order.delivery || null,
+        notReceivedProducts: [...requestedProducts],
+        delivery: null,
         total_price: getTotalPrice(requestedProducts),
         createdOn: new Date().toISOString()
       };    
@@ -46,15 +47,14 @@ class OrderService {
     return { ...orderFromDB._doc, customer };
   }
 
-  async update(order: IOrderRequest): Promise<IOrderResponse> {
-    if (!order._id) {
-      throw new Error("Id was not provided");
-    }
+  async update(order: Pick<IOrderRequest, 'customer' | 'requestedProducts' | '_id'>): Promise<IOrderResponse> {
+
     const requestedProducts = await Promise.all(order.requestedProducts.map(async (id) => (await ProductsService.getProduct(id))._doc));
     const newOrder = {
       status: ORDER_STATUSES.DRAFT,
       customer: order.customer,
       requestedProducts,
+      notReceivedProducts: [...requestedProducts],
       total_price: getTotalPrice(requestedProducts),
     } as Omit<IOrder, "createdOn" | "delivery">
     const updatedOrder = await Order.findByIdAndUpdate(order._id, newOrder, { new: true });
