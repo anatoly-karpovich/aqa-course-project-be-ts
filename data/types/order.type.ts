@@ -13,7 +13,7 @@ export interface IOrderRequest extends mongoose.Document, DocumentResult<IOrder>
   receivedProducts?: mongoose.Types.ObjectId[];
   delivery?: IDelivery;
   total_price: number;
-  createdOn: Date;
+  createdOn: string;
 }
 
 export interface IOrder extends mongoose.Document, DocumentResult<IOrder> {
@@ -24,7 +24,7 @@ export interface IOrder extends mongoose.Document, DocumentResult<IOrder> {
   receivedProducts?: IProduct[];
   delivery?: IDelivery;
   total_price: number;
-  createdOn: Date;
+  createdOn: string;
 }
 
 export interface IOrderResponse {
@@ -35,5 +35,5 @@ export interface IOrderResponse {
   receivedProducts?: IProduct[];
   delivery?: IDelivery;
   total_price: number;
-  createdOn: Date;
+  createdOn: string;
 }

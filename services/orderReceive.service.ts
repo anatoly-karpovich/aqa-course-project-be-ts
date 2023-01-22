@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import { ORDER_STATUSES } from "../data/enums";
 import { IOrderRequest, IOrderResponse } from "../data/types/order.type";
 import Order from "../models/order.model";
@@ -9,10 +8,9 @@ class OrderReceiveService {
       throw new Error("Id was not provided");
     }
     const orderFromDb = await Order.findById(order._id);
-    const productsToReceive = orderFromDb.requestedProducts.filter((product) => order.receivedProducts.map((i) => i.toString()).includes(product._id.toString()));
-    const receivedProducts = [...orderFromDb.receivedProducts, ...productsToReceive];
+    const receivedProducts = order.receivedProducts.map(i => i.toString()).map(i => orderFromDb.requestedProducts.find(p => p._id.toString() === i))
     const orderWithReceivedProducts = {
-      receivedProducts: [...new Set(receivedProducts.map((p) => JSON.stringify(p)))].map((p) => JSON.parse(p)),
+        receivedProducts,
       status: orderFromDb.status,
     };
     if (orderWithReceivedProducts.receivedProducts.length && orderWithReceivedProducts.receivedProducts.length < orderFromDb.requestedProducts.length)

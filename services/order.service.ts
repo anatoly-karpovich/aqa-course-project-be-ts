@@ -7,13 +7,13 @@ import { getTotalPrice } from "../utils/utils";
 import { ORDER_STATUSES } from "../data/enums";
 
 class OrderService {
-  async create(order: IOrderRequest): Promise<IOrderResponse> {
+  async create(order: Pick<IOrderRequest, 'customer' | 'requestedProducts'>): Promise<IOrderResponse> {
       const requestedProducts = await Promise.all(order.requestedProducts.map(async (id) => (await ProductsService.getProduct(id))._doc));
       const newOrder = {
         status: ORDER_STATUSES.DRAFT,
         customer: order.customer,
         requestedProducts,
-        delivery: order.delivery || null,
+        delivery: null,
         total_price: getTotalPrice(requestedProducts),
         createdOn: new Date().toISOString()
       };    
@@ -46,10 +46,8 @@ class OrderService {
     return { ...orderFromDB._doc, customer };
   }
 
-  async update(order: IOrderRequest): Promise<IOrderResponse> {
-    if (!order._id) {
-      throw new Error("Id was not provided");
-    }
+  async update(order: Pick<IOrderRequest, 'customer' | 'requestedProducts' | '_id'>): Promise<IOrderResponse> {
+
     const requestedProducts = await Promise.all(order.requestedProducts.map(async (id) => (await ProductsService.getProduct(id))._doc));
     const newOrder = {
       status: ORDER_STATUSES.DRAFT,
