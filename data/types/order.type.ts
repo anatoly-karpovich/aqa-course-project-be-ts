@@ -3,6 +3,7 @@ import { DocumentResult } from "./document.type";
 import * as mongoose from 'mongoose';
 import { ICustomer } from "./customer.type";
 import { IProduct } from "./product.type";
+import { IDelivery } from "./delivery.type";
 
 export interface IOrder extends mongoose.Document, DocumentResult<IOrder> {
   _id?: mongoose.Types.ObjectId;
@@ -10,16 +11,9 @@ export interface IOrder extends mongoose.Document, DocumentResult<IOrder> {
   customer: mongoose.Types.ObjectId;
   requestedProducts: mongoose.Types.ObjectId[];
   receivedProducts?: mongoose.Types.ObjectId[];
-  delivery?: {
-    finalDate: Date;
-    condition: "Delivery" | "Pick Up";
-    address: {
-      country: COUNTRIES;
-      city: string;
-      address: string;
-    };
-  };
+  delivery?: IDelivery;
   total_price: number;
+  createdOn: Date;
 }
 
 export interface IOrderResponse {
@@ -28,14 +22,7 @@ export interface IOrderResponse {
   customer: ICustomer;
   requestedProducts: IProduct[];
   receivedProducts?: IProduct[];
-  delivery?: {
-    finalDate: Date;
-    condition: "Delivery" | "Pick Up";
-    address: {
-      country: COUNTRIES;
-      city: string;
-      address: string;
-    };
-  };
+  delivery?: IDelivery;
   total_price: number;
+  createdOn: Date;
 }

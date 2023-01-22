@@ -3,7 +3,7 @@ import CustomerService from "../services/customer.service.js";
 import ProductsService from "../services/products.service.js";
 import {Request, Response, NextFunction} from 'express'
 
-import { ORDER_STATUSES } from "../data/constants.js";
+import { ORDER_STATUSES } from "../data/enums";
 
 export async function orderById(req: Request, res: Response, next: NextFunction) {
   try {
@@ -50,7 +50,7 @@ export async function orderValidations(req: Request, res: Response, next: NextFu
 export async function orderStatus(req: Request, res: Response, next: NextFunction) {
   try {
     const status = req.body.status;
-    if (!ORDER_STATUSES.includes(status)) {
+    if (!Object.values(ORDER_STATUSES).includes(status)) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: `'${status}' is not a valid status` });
     }
     if(status !== "In Process" && status !== "Canceled") {
@@ -79,7 +79,7 @@ export async function orderUpdateValidations(req: Request, res: Response, next: 
       if(!order)
       return res.status(404).json({ IsSuccess: false, ErrorMessage: `Order with id '${req.body._id}' wasn't found` });
     if(order.status !== 'Draft') {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: `Invalid order status for updating` });
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: `Invalid order status` });
     }
     next()
   } catch (e) {
@@ -96,7 +96,7 @@ export async function orderReceiveValidations(req: Request, res: Response, next:
     }
 
     if(order.status === 'Draft' || order.status === 'Received') {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: `Invalid order status for receiving` });
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: `Invalid order status` });
     }
 
     if (req.body.receivedProducts.length > order.requestedProducts.length 
@@ -110,9 +110,24 @@ export async function orderReceiveValidations(req: Request, res: Response, next:
       }
     }
     next();
-  } catch (e) {
+  } catch (e: any) {
     console.log(e);
+    return res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
   }
 }
 
-
+export async function orderDelivery(req: Request, res: Response, next: NextFunction) {
+  try {
+    const id = req.body._id || req.params.id;
+    const order = await OrderService.getOrder(id);
+    if(!order) {
+      return res.status(404).json({ IsSuccess: false, ErrorMessage: `Order with id '${req.body._id}' wasn't found` });
+    }
+    if(order.status !== ORDER_STATUSES.DRAFT) {
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: `Invalid order status` });
+    }
+  } catch(e: any) {
+    return res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
+  }
+  next()
+}

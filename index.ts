@@ -9,6 +9,7 @@ import orderReceiveRouter from "./routers/orderReceive.router";
 import authRouter from "./routers/auth.router";
 import fileUpload from "express-fileupload";
 import swaggerDocs from './utils/swagger.js'
+import orderDeliveryRouter from './routers/orderDelivery.router';
 // import swaggerjJsdoc from 'swagger-jsdoc'
 // import swaggerUi from 'swagger-ui-express'
 // import  pkg  from './package.json' assert { type: "json" }
@@ -53,6 +54,7 @@ app.use('/api', customerRouter)
 app.use('/api', orderRouter)
 app.use('/api', orderStatusRouter)
 app.use('/api', orderReceiveRouter)
+app.use('/api', orderDeliveryRouter)
 
 
 

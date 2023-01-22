@@ -4,6 +4,6 @@ import Router  from "express";
 
 const orderStatusRouter = Router()
 
-orderStatusRouter.put('/orderStatus', orderById, orderStatus, OrderStatusController.update)
+orderStatusRouter.put('/orders/status', orderById, orderStatus, OrderStatusController.update)
 
 export default orderStatusRouter

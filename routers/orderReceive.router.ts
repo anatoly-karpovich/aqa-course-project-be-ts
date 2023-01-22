@@ -4,6 +4,6 @@ import { orderReceiveValidations } from "../middleware/orderMiddleware.js";
 
 const orderReceiveRouter = Router()
 
-orderReceiveRouter.post('/receive', orderReceiveValidations, OrderReceiveController.receiveProducts)
+orderReceiveRouter.post('/orders/receive', orderReceiveValidations, OrderReceiveController.receiveProducts)
 
 export default orderReceiveRouter
