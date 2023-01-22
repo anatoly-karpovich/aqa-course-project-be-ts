@@ -7,12 +7,13 @@ import { getTotalPrice } from "../utils/utils";
 import { ORDER_STATUSES } from "../data/enums";
 
 class OrderService {
-  async create(order: Pick<IOrderRequest, 'customer' | 'requestedProducts'>): Promise<IOrderResponse> {
+  async create(order: IOrderRequest): Promise<IOrderResponse> {
       const requestedProducts = await Promise.all(order.requestedProducts.map(async (id) => (await ProductsService.getProduct(id))._doc));
       const newOrder = {
         status: ORDER_STATUSES.DRAFT,
         customer: order.customer,
         requestedProducts,
+        notReceivedProducts: [...requestedProducts],
         delivery: null,
         total_price: getTotalPrice(requestedProducts),
         createdOn: new Date().toISOString()
@@ -53,6 +54,7 @@ class OrderService {
       status: ORDER_STATUSES.DRAFT,
       customer: order.customer,
       requestedProducts,
+      notReceivedProducts: [...requestedProducts],
       total_price: getTotalPrice(requestedProducts),
     } as Omit<IOrder, "createdOn" | "delivery">
     const updatedOrder = await Order.findByIdAndUpdate(order._id, newOrder, { new: true });
