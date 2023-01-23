@@ -1,3 +1,4 @@
+import _ from "lodash";
 import { ORDER_STATUSES } from "../data/enums";
 import { IOrder, IOrderResponse } from "../data/types/order.type";
 import Order from "../models/order.model";
@@ -22,6 +23,10 @@ class OrderReceiveService {
     orderFromDb.status = ORDER_STATUSES.PARTIALLY_RECEIVED;
     if (orderFromDb.receivedProducts.length && orderFromDb.receivedProducts.length === orderFromDb.requestedProducts.length)
     orderFromDb.status = ORDER_STATUSES.RECEIVED;
+    orderFromDb.history.push({
+        ..._.omit(orderFromDb, ['history', 'notReceivedProducts', 'createdOn', '_id']), 
+        changedOn: new Date().toISOString()
+    })
     const updatedOrder = await Order.findByIdAndUpdate(order._id, orderFromDb, { new: true });
     const customer = await CustomerService.getCustomer(updatedOrder.customer);
     return { ...updatedOrder._doc, customer };

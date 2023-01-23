@@ -5,6 +5,7 @@ import { IOrder, IOrderRequest, IOrderResponse } from "../data/types/order.type"
 import { Types } from "mongoose";
 import { getTotalPrice } from "../utils/utils";
 import { ORDER_STATUSES } from "../data/enums";
+import _ from "lodash";
 
 class OrderService {
   async create(order: IOrderRequest): Promise<IOrderResponse> {
@@ -16,12 +17,15 @@ class OrderService {
         notReceivedProducts: [...requestedProducts],
         delivery: null,
         total_price: getTotalPrice(requestedProducts),
-        createdOn: new Date().toISOString()
-      };    
+        createdOn: new Date().toISOString(),
+      };
+      newOrder['history'] = {
+        ..._.omit(newOrder, ['history', 'notReceivedProducts', 'createdOn']), 
+        changedOn: new Date().toISOString()
+      }
       const createdOrder = await Order.create(newOrder);
       const customer = await CustomerService.getCustomer(createdOrder.customer);
-      const orderData = Object.assign(createdOrder._doc);
-      return { ...orderData, customer };
+      return { ...createdOrder._doc, customer };
     }
 
   async getAll(): Promise<IOrderResponse[]> {
@@ -47,16 +51,23 @@ class OrderService {
     return { ...orderFromDB._doc, customer };
   }
 
-  async update(order: Pick<IOrderRequest, 'customer' | 'requestedProducts' | '_id'>): Promise<IOrderResponse> {
+  async update(order: IOrderRequest): Promise<IOrderResponse> {
 
     const requestedProducts = await Promise.all(order.requestedProducts.map(async (id) => (await ProductsService.getProduct(id))._doc));
+    const orderFromDb = await this.getOrder(order._id)
     const newOrder = {
       status: ORDER_STATUSES.DRAFT,
       customer: order.customer,
       requestedProducts,
+      delivery: orderFromDb.delivery,
       notReceivedProducts: [...requestedProducts],
       total_price: getTotalPrice(requestedProducts),
-    } as Omit<IOrder, "createdOn" | "delivery">
+      history: orderFromDb.history,
+    }
+      newOrder.history.push({
+      ..._.omit(newOrder, ['history', 'notReceivedProducts', 'createdOn', '_id']), 
+      changedOn: new Date().toISOString()
+    })
     const updatedOrder = await Order.findByIdAndUpdate(order._id, newOrder, { new: true });
     const customer = await CustomerService.getCustomer(updatedOrder.customer);
     return { ...updatedOrder._doc, customer };

@@ -16,21 +16,23 @@ export interface IOrder extends mongoose.Document, DocumentResult<IOrder> {
   status: ORDER_STATUSES;
   customer: mongoose.Types.ObjectId;
   requestedProducts: IProduct[];
-  notReceivedProducts: IProduct[];
+  notReceivedProducts?: IProduct[];
   receivedProducts?: IProduct[];
   delivery?: IDelivery;
   total_price: number;
   createdOn: string;
+  history: Omit<IOrder, 'history' | 'notReceivedProducts'> & Required<{changedOn: string}>[];
 }
 
 export interface IOrderResponse {
   readonly _id?: mongoose.Types.ObjectId;
-  status: string;
+  status: ORDER_STATUSES;
   customer: ICustomer;
   requestedProducts: IProduct[];
-  notReceivedProducts: IProduct[];
+  notReceivedProducts?: IProduct[];
   receivedProducts?: IProduct[];
   delivery?: IDelivery;
   total_price: number;
   createdOn: string;
+  history: Omit<IOrder, 'history' | 'notReceivedProducts'> & Required<{changedOn: string}>[];
 }

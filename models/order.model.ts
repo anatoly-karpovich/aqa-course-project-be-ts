@@ -39,8 +39,8 @@ const Order = new mongoose.Schema({
   receivedProducts: [{ type: product, required: true }],
   delivery: { type: delivery, required: false },
   total_price: { type: Number, require: true },
-  createdOn: { type: Date, required: true }
-  //   history: [{type: history, required: false}]
+  createdOn: { type: Date, required: true },
+  history: [{type: history, required: false}]
   //   createdBy: { type: String, required: true },
 });
 
