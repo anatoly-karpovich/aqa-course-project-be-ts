@@ -1,4 +1,4 @@
-import { COUNTRIES, ORDER_STATUSES } from "../enums";
+import { ORDER_STATUSES } from "../enums";
 import { DocumentResult } from "./document.type";
 import * as mongoose from 'mongoose';
 import { ICustomer } from "./customer.type";
@@ -16,12 +16,12 @@ export interface IOrder extends mongoose.Document, DocumentResult<IOrder> {
   status: ORDER_STATUSES;
   customer: mongoose.Types.ObjectId;
   requestedProducts: IProduct[];
-  notReceivedProducts?: IProduct[];
-  receivedProducts?: IProduct[];
-  delivery?: IDelivery;
+  notReceivedProducts: IProduct[];
+  receivedProducts: IProduct[];
+  delivery: IDelivery | null;
   total_price: number;
   createdOn: string;
-  history: Omit<IOrder, 'history' | 'notReceivedProducts'> & Required<{changedOn: string}>[];
+  history: IHistory[];
 }
 
 export interface IOrderResponse {
@@ -29,10 +29,33 @@ export interface IOrderResponse {
   status: ORDER_STATUSES;
   customer: ICustomer;
   requestedProducts: IProduct[];
-  notReceivedProducts?: IProduct[];
-  receivedProducts?: IProduct[];
-  delivery?: IDelivery;
+  notReceivedProducts: IProduct[];
+  receivedProducts: IProduct[];
+  delivery: IDelivery | null;
   total_price: number;
   createdOn: string;
-  history: Omit<IOrder, 'history' | 'notReceivedProducts'> & Required<{changedOn: string}>[];
+  history: IHistory[];
+}
+
+export interface IHistory {
+  readonly status: string,
+  readonly customer: string;
+  readonly requestedProducts: IProduct[];
+  readonly receivedProducts: IProduct[];
+  readonly delivery: IDelivery | null;
+  readonly total_price: number;
+  readonly changedOn: string
+}
+
+export type OrderType = {
+  readonly _id?: mongoose.Types.ObjectId;
+  status: ORDER_STATUSES;
+  customer: string;
+  requestedProducts: IProduct[];
+  notReceivedProducts: IProduct[];
+  receivedProducts: IProduct[];
+  delivery: IDelivery | null;
+  total_price: number;
+  createdOn: string;
+  history: IHistory[];
 }

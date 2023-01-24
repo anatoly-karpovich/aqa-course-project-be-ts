@@ -10,6 +10,7 @@ class OrderController {
                 const order = await OrderService.create(req.body)
                 res.status(RESPONSE_STATUSES.created).json({Order: order, IsSuccess: true, ErrorMessage: null})
         } catch (e: any) {
+            console.log(e)
             res.status(RESPONSE_STATUSES.server_error).json({IsSuccess: false, ErrorMessage: e.message})
         }
     }
@@ -19,6 +20,7 @@ class OrderController {
             const orders = await OrderService.getAll()
             return res.status(200).json({Orders: orders, IsSuccess: true, ErrorMessage: null})
         } catch(e: any) {
+            console.log(e)
             res.status(RESPONSE_STATUSES.server_error).json({IsSuccess: false, ErrorMessage: e.message})
         }
     }
@@ -29,6 +31,7 @@ class OrderController {
             const order = await OrderService.getOrder(id)
             res.status(200).json({Order: order, IsSuccess: true, ErrorMessage: null})
         } catch(e: any) {
+            console.log(e)
             res.status(RESPONSE_STATUSES.server_error).json({IsSuccess: false, ErrorMessage: e.message})
         }
     }
@@ -38,6 +41,7 @@ class OrderController {
             const updatedOrder = await OrderService.update(req.body)
             return res.status(200).json({Order: updatedOrder, IsSuccess: true, ErrorMessage: null})
         } catch(e: any) {
+            console.log(e)
             res.status(RESPONSE_STATUSES.server_error).json({IsSuccess: false, ErrorMessage: e.message})
         }
     }
@@ -48,6 +52,7 @@ class OrderController {
             const order = await OrderService.delete(id)
             return res.status(204).json(order)
         } catch(e: any) {
+            console.log(e)
             res.status(RESPONSE_STATUSES.server_error).json({IsSuccess: false, ErrorMessage: e.message})
         }
     }

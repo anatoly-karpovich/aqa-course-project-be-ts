@@ -2,32 +2,36 @@ import _ from "lodash";
 import { ORDER_STATUSES } from "../data/enums";
 import { IOrder, IOrderResponse } from "../data/types/order.type";
 import Order from "../models/order.model";
+import { getTodaysDate } from "../utils/utils";
 import CustomerService from "./customer.service";
+import OrderService from "./order.service";
+
 class OrderReceiveService {
   async receiveProducts(order: Pick<IOrder, "_id" | "receivedProducts">): Promise<IOrderResponse> {
     if (!order._id) {
       throw new Error("Id was not provided");
     }
-    const orderFromDb = await Order.findById(order._id);
+    const orderFromDB = await OrderService.getOrder(order._id)
     for(const p of order.receivedProducts) {
-        const product = orderFromDb.notReceivedProducts.find(e => e._id.toString() === p.toString())
+        const product = orderFromDB.notReceivedProducts.find(e => e._id.toString() === p.toString())
         if(product) {
-            const start = orderFromDb.notReceivedProducts.findIndex(e => e._id.toString() === p.toString())
-            orderFromDb.notReceivedProducts.splice(start,1)
-            orderFromDb.receivedProducts.push(product)
+            const start = orderFromDB.notReceivedProducts.findIndex(e => e._id.toString() === p.toString())
+            orderFromDB.notReceivedProducts.splice(start,1)
+            orderFromDB.receivedProducts.push(product)
         } else {
             throw new Error(`Product with id '${p}' is already received`)
         }
     }
-    if (orderFromDb.receivedProducts.length && orderFromDb.receivedProducts.length < orderFromDb.requestedProducts.length)
-    orderFromDb.status = ORDER_STATUSES.PARTIALLY_RECEIVED;
-    if (orderFromDb.receivedProducts.length && orderFromDb.receivedProducts.length === orderFromDb.requestedProducts.length)
-    orderFromDb.status = ORDER_STATUSES.RECEIVED;
-    orderFromDb.history.push({
-        ..._.omit(orderFromDb, ['history', 'notReceivedProducts', 'createdOn', '_id']), 
-        changedOn: new Date().toISOString()
+    if (orderFromDB.receivedProducts.length && orderFromDB.receivedProducts.length < orderFromDB.requestedProducts.length)
+    orderFromDB.status = ORDER_STATUSES.PARTIALLY_RECEIVED;
+    if (orderFromDB.receivedProducts.length && orderFromDB.receivedProducts.length === orderFromDB.requestedProducts.length)
+    orderFromDB.status = ORDER_STATUSES.RECEIVED;
+    orderFromDB.history.push({
+        ..._.omit(orderFromDB, ['history', 'notReceivedProducts', 'createdOn', '_id']), 
+        customer: orderFromDB.customer._id.toString(),
+        changedOn: getTodaysDate()
     })
-    const updatedOrder = await Order.findByIdAndUpdate(order._id, orderFromDb, { new: true });
+    const updatedOrder = await Order.findByIdAndUpdate(order._id, orderFromDB, { new: true });
     const customer = await CustomerService.getCustomer(updatedOrder.customer);
     return { ...updatedOrder._doc, customer };
   }

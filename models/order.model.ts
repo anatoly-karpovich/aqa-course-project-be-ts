@@ -23,9 +23,10 @@ const delivery = new mongoose.Schema({
 
 const history = new mongoose.Schema({ 
   status: { type: String, required: true },
-  customer: { type: mongoose.SchemaTypes.ObjectId, ref: "Customer", required: true },
+  customer: { type: String, required: true },
   requestedProducts: [{ type: product, required: true }],
   receivedProducts: [{ type: product, required: true }],
+  total_price: { type: Number, require: true },
   delivery: { type: delivery, required: false },
   changedOn: { type: Date, required: true }
  }, {_id: false})

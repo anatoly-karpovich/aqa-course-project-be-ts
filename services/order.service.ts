@@ -1,28 +1,28 @@
 import Order from "../models/order.model";
 import CustomerService from "./customer.service";
 import ProductsService from "./products.service";
-import { IOrder, IOrderRequest, IOrderResponse } from "../data/types/order.type";
+import { IOrder, IOrderRequest, IOrderResponse, OrderType } from "../data/types/order.type";
 import { Types } from "mongoose";
-import { getTotalPrice } from "../utils/utils";
+import { getTotalPrice, getTodaysDate, createHistoryEntry } from "../utils/utils";
 import { ORDER_STATUSES } from "../data/enums";
 import _ from "lodash";
 
 class OrderService {
   async create(order: IOrderRequest): Promise<IOrderResponse> {
       const requestedProducts = await Promise.all(order.requestedProducts.map(async (id) => (await ProductsService.getProduct(id))._doc));
-      const newOrder = {
+      const newOrder: OrderType = {
         status: ORDER_STATUSES.DRAFT,
-        customer: order.customer,
+        customer: order.customer.toString(),
         requestedProducts,
-        notReceivedProducts: [...requestedProducts],
+        notReceivedProducts: requestedProducts,
         delivery: null,
         total_price: getTotalPrice(requestedProducts),
-        createdOn: new Date().toISOString(),
+        createdOn: getTodaysDate(),
+        receivedProducts: [],
+        history: []
       };
-      newOrder['history'] = {
-        ..._.omit(newOrder, ['history', 'notReceivedProducts', 'createdOn']), 
-        changedOn: new Date().toISOString()
-      }
+      newOrder.history.push(createHistoryEntry(newOrder))
+
       const createdOrder = await Order.create(newOrder);
       const customer = await CustomerService.getCustomer(createdOrder.customer);
       return { ...createdOrder._doc, customer };
@@ -55,19 +55,19 @@ class OrderService {
 
     const requestedProducts = await Promise.all(order.requestedProducts.map(async (id) => (await ProductsService.getProduct(id))._doc));
     const orderFromDb = await this.getOrder(order._id)
-    const newOrder = {
+    const newOrder: OrderType = {
       status: ORDER_STATUSES.DRAFT,
-      customer: order.customer,
+      customer: order.customer.toString(),
       requestedProducts,
+      receivedProducts: orderFromDb.receivedProducts,
       delivery: orderFromDb.delivery,
       notReceivedProducts: [...requestedProducts],
       total_price: getTotalPrice(requestedProducts),
       history: orderFromDb.history,
+      createdOn: orderFromDb.createdOn
     }
-      newOrder.history.push({
-      ..._.omit(newOrder, ['history', 'notReceivedProducts', 'createdOn', '_id']), 
-      changedOn: new Date().toISOString()
-    })
+    newOrder.history.push(createHistoryEntry(newOrder)) 
+
     const updatedOrder = await Order.findByIdAndUpdate(order._id, newOrder, { new: true });
     const customer = await CustomerService.getCustomer(updatedOrder.customer);
     return { ...updatedOrder._doc, customer };

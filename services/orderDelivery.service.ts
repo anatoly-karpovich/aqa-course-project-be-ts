@@ -1,8 +1,9 @@
 import Order from "../models/order.model";
 import CustomerService from "./customer.service";
 import _ from "lodash";
-import { IOrder, IOrderResponse } from "../data/types/order.type";
+import { IOrder, IOrderResponse, OrderType } from "../data/types/order.type";
 import OrderService from "./order.service";
+import { createHistoryEntry } from "../utils/utils";
 
 class OrderDeliveryService {
   async updateDelivery(order: Pick<IOrder, "_id" | "delivery">): Promise<IOrderResponse> {
@@ -10,14 +11,12 @@ class OrderDeliveryService {
       throw new Error("Id was not provided");
     }
     const orderFromDB = await OrderService.getOrder(order._id)
-    const newOrder = {
+    const newOrder: OrderType = {
       ...orderFromDB,
+      customer: orderFromDB.customer._id.toString(),
       delivery: order.delivery,
     };
-    newOrder.history.push({
-      ..._.omit(newOrder, ['history', 'notReceivedProducts', 'createdOn', '_id']), 
-      changedOn: new Date().toISOString()
-    })
+    newOrder.history.push(createHistoryEntry(newOrder))
     const updatedOrder = await Order.findByIdAndUpdate(newOrder._id, newOrder, { new: true });
     const customer = await CustomerService.getCustomer(updatedOrder.customer);
     
