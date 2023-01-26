@@ -1,3 +1,3 @@
 export interface DocumentResult<T> {
-    _doc?: T;
+  _doc?: T;
 }

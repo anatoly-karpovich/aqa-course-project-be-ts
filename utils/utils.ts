@@ -1,5 +1,5 @@
-import { IHistory, OrderType } from "../data/types/order.type";
-import { IProduct } from "../data/types/product.type";
+import type { IHistory, IOrder, IOrderRequest, IProduct } from "../data/types";
+import ProductsService from "../services/products.service";
 
 export const getTotalPrice = (products: IProduct[]) => {
   return products.reduce((a, b) => {
@@ -12,7 +12,7 @@ export const getTodaysDate = () => {
   return new Date().toISOString()
 }
 
-export const createHistoryEntry = (order: OrderType): IHistory => {
+export const createHistoryEntry = (order: IOrder<string>): IHistory => {
   return {
         status: order.status,
         requestedProducts: order.requestedProducts,
@@ -22,4 +22,8 @@ export const createHistoryEntry = (order: OrderType): IHistory => {
         total_price: order.total_price,
         changedOn: getTodaysDate()
   }
+}
+
+export const productsMapping = async (order: IOrderRequest): Promise<IProduct[]> => {
+  return await Promise.all(order.requestedProducts.map(async (id) => (await ProductsService.getProduct(id))._doc));
 }
