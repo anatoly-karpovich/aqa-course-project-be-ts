@@ -2,7 +2,7 @@ import { isValidInput } from "../utils/validations.js";
 import { VALIDATION_ERROR_MESSAGES, COUNTRIES, CUSTOMER_REQUIRED_KEYS } from "../data/constants.js";
 import CustomerService from "../services/customer.service.js";
 import Order from "../models/order.model.js";
-import {Request, Response, NextFunction} from 'express'
+import { Request, Response, NextFunction } from "express";
 
 export async function customerValidations(req: Request, res: Response, next: NextFunction) {
   try {
@@ -52,9 +52,9 @@ export async function customerValidations(req: Request, res: Response, next: Nex
 
 export async function customerById(req: Request, res: Response, next: NextFunction) {
   try {
-    const id = req.body._id || req.params.id
+    const id = req.body._id || req.params.id;
     const customer = await CustomerService.getCustomer(id);
-    if(!customer) {
+    if (!customer) {
       return res.status(404).json({ IsSuccess: false, ErrorMessage: `Customer with id '${id}' wasn't found` });
     }
     next();
@@ -66,8 +66,8 @@ export async function customerById(req: Request, res: Response, next: NextFuncti
 
 export async function deleteCustomer(req: Request, res: Response, next: NextFunction) {
   try {
-    const order = await Order.findOne({customer: req.params.id});
-    if(order) {
+    const order = await Order.findOne({ customer: req.params.id });
+    if (order) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: `Not allowed to delete customer, assigned to the order` });
     }
     next();

@@ -1,4 +1,4 @@
 export interface IAuth {
-    user: string,
-    password: string
+  user: string;
+  password: string;
 }

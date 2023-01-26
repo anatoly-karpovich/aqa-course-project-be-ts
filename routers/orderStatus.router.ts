@@ -1,9 +1,9 @@
 import OrderStatusController from "../controllers/orderStatus.controller.js";
 import { orderById, orderStatus } from "../middleware/orderMiddleware.js";
-import Router  from "express";
+import Router from "express";
 
-const orderStatusRouter = Router()
+const orderStatusRouter = Router();
 
-orderStatusRouter.put('/orders/status', orderById, orderStatus, OrderStatusController.update)
+orderStatusRouter.put("/orders/status", orderById, orderStatus, OrderStatusController.update);
 
-export default orderStatusRouter
+export default orderStatusRouter;

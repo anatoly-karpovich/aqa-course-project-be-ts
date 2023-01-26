@@ -1,6 +1,6 @@
-import mongoose, { Types } from "mongoose";
+import mongoose from "mongoose";
 import { COUNTRIES } from "../data/enums";
-import { ICustomer } from "../data/types/customer.type";
+import { ICustomerDocument } from "../data/types";
 
 export const CustomerSchema = new mongoose.Schema({
   email: { type: String, unique: true, required: true },
@@ -12,4 +12,4 @@ export const CustomerSchema = new mongoose.Schema({
   notes: { type: String, required: false },
 });
 
-export default mongoose.model<ICustomer>("Customer", CustomerSchema);
+export default mongoose.model<ICustomerDocument>("Customer", CustomerSchema);
