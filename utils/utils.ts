@@ -1,4 +1,4 @@
-import type { IHistory, IOrder, IOrderRequest, IProduct } from "../data/types";
+import type { IHistory, IOrderRequest, IProduct } from "../data/types";
 import ProductsService from "../services/products.service";
 
 export const getTotalPrice = (products: IProduct[]) => {
@@ -9,21 +9,21 @@ export const getTotalPrice = (products: IProduct[]) => {
 };
 
 export const getTodaysDate = () => {
-  return new Date().toISOString()
-}
+  return new Date().toISOString();
+};
 
-export const createHistoryEntry = (order: IOrder<string>): IHistory => {
+export function createHistoryEntry<T extends Omit<IHistory, "changedOn">>(order: T): IHistory {
   return {
-        status: order.status,
-        requestedProducts: order.requestedProducts,
-        receivedProducts: order.receivedProducts,
-        customer: order.customer.toString(),
-        delivery: order.delivery,
-        total_price: order.total_price,
-        changedOn: getTodaysDate()
-  }
+    status: order.status,
+    requestedProducts: order.requestedProducts,
+    receivedProducts: order.receivedProducts,
+    customer: order.customer.toString(),
+    delivery: order.delivery,
+    total_price: order.total_price,
+    changedOn: getTodaysDate()
+  };
 }
 
-export const productsMapping = async (order: IOrderRequest): Promise<IProduct[]> => {
+export async function productsMapping<T extends Pick<IOrderRequest, "requestedProducts">> (order: T): Promise<IProduct[]> {
   return await Promise.all(order.requestedProducts.map(async (id) => (await ProductsService.getProduct(id))._doc));
-}
+};

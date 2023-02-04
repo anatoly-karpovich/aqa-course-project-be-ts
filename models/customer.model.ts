@@ -10,6 +10,6 @@ export const CustomerSchema = new mongoose.Schema({
   address: { type: String, required: true },
   phone: { type: String, required: true },
   notes: { type: String, required: false },
-});
+}, { versionKey: false });
 
 export default mongoose.model<ICustomerDocument>("Customer", CustomerSchema);

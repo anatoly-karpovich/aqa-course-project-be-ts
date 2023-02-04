@@ -2,10 +2,10 @@ import { ORDER_STATUSES } from "../enums";
 import * as mongoose from "mongoose";
 import type { ICustomer, IProduct, IDelivery, DocumentResult } from "./";
 
-export interface IOrder<T> {
+export interface IOrder<CustomerType> {
   readonly _id?: mongoose.Types.ObjectId;
   status: ORDER_STATUSES;
-  customer: T extends ICustomer ? ICustomer : T extends mongoose.Types.ObjectId ? mongoose.Types.ObjectId : string;
+  customer: CustomerType extends ICustomer ? ICustomer : CustomerType extends mongoose.Types.ObjectId ? mongoose.Types.ObjectId : string;
   requestedProducts: IProduct[];
   notReceivedProducts: IProduct[];
   receivedProducts: IProduct[];
@@ -15,7 +15,7 @@ export interface IOrder<T> {
   history: IHistory[];
 }
 
-export interface IOrderRequest extends mongoose.Document, DocumentResult<IOrderDocument> {
+export interface IOrderRequest {
   readonly _id?: mongoose.Types.ObjectId;
   customer: mongoose.Types.ObjectId;
   requestedProducts: mongoose.Types.ObjectId[];

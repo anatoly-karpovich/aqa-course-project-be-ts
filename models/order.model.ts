@@ -51,6 +51,6 @@ const Order = new mongoose.Schema({
   createdOn: { type: Date, required: true },
   history: [{ type: history, required: false }],
   //   createdBy: { type: String, required: true },
-});
+}, { versionKey: false });
 
 export default mongoose.model<IOrderDocument>("Order", Order);

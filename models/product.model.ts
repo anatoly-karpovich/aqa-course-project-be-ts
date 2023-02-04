@@ -8,6 +8,6 @@ export const ProductSchema = new mongoose.Schema({
   price: { type: Number, required: true },
   manufacturer: { type: String, enum: MANUFACTURER, required: true },
   notes: { type: String, required: false },
-});
+}, { versionKey: false });
 
 export default mongoose.model<IProductDocument>("Product", ProductSchema);
