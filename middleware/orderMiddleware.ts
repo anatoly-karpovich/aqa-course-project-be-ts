@@ -2,7 +2,6 @@ import OrderService from "../services/order.service.js";
 import CustomerService from "../services/customer.service.js";
 import ProductsService from "../services/products.service.js";
 import { Request, Response, NextFunction } from "express";
-
 import { ORDER_STATUSES } from "../data/enums";
 
 export async function orderById(req: Request, res: Response, next: NextFunction) {
@@ -13,8 +12,9 @@ export async function orderById(req: Request, res: Response, next: NextFunction)
       return res.status(404).json({ IsSuccess: false, ErrorMessage: `Order with id '${id}' wasn't found` });
     }
     next();
-  } catch (e) {
+  } catch (e: any) {
     console.log(e);
+    return res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
   }
 }
 
@@ -25,9 +25,6 @@ export async function orderValidations(req: Request, res: Response, next: NextFu
 
   if (!req.body.requestedProducts || !req.body.requestedProducts.length) {
     return res.status(404).json({ IsSuccess: false, ErrorMessage: `Missing products` });
-  }
-  if (req.body.requestedProducts.length > 5) {
-    return res.status(404).json({ IsSuccess: false, ErrorMessage: `Incorrect amount of products` });
   }
 
   try {
@@ -43,9 +40,9 @@ export async function orderValidations(req: Request, res: Response, next: NextFu
       }
     }
     next();
-  } catch (e) {
+  } catch (e: any) {
     console.log(e);
-    return res.status(400).json({ IsSuccess: false, ErrorMessage: `Incorrect request body` });
+    return res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
   }
 }
 
@@ -74,8 +71,9 @@ export async function orderStatus(req: Request, res: Response, next: NextFunctio
       return res.status(400).json({ IsSuccess: false, ErrorMessage: `Can't process order. Please, schedule delivery` });
     }
     next();
-  } catch (e) {
+  } catch (e: any) {
     console.log(e);
+    return res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
   }
 }
 
@@ -88,8 +86,9 @@ export async function orderUpdateValidations(req: Request, res: Response, next: 
       return res.status(400).json({ IsSuccess: false, ErrorMessage: `Invalid order status` });
     }
     next();
-  } catch (e) {
+  } catch (e: any) {
     console.log(e);
+    return res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
   }
 }
 

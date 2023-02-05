@@ -1,5 +1,4 @@
 import OrderService from "../services/order.service.js";
-import { RESPONSE_STATUSES } from "../data/constants.js";
 import { Request, Response } from "express";
 import mongoose from "mongoose";
 
@@ -7,10 +6,10 @@ class OrderController {
   async create(req: Request, res: Response) {
     try {
       const order = await OrderService.create(req.body);
-      res.status(RESPONSE_STATUSES.created).json({ Order: order, IsSuccess: true, ErrorMessage: null });
+      res.status(201).json({ Order: order, IsSuccess: true, ErrorMessage: null });
     } catch (e: any) {
       console.log(e);
-      res.status(RESPONSE_STATUSES.server_error).json({ IsSuccess: false, ErrorMessage: e.message });
+      res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
     }
   }
 
@@ -20,7 +19,7 @@ class OrderController {
       return res.status(200).json({ Orders: orders, IsSuccess: true, ErrorMessage: null });
     } catch (e: any) {
       console.log(e);
-      res.status(RESPONSE_STATUSES.server_error).json({ IsSuccess: false, ErrorMessage: e.message });
+      res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
     }
   }
 
@@ -31,7 +30,7 @@ class OrderController {
       res.status(200).json({ Order: order, IsSuccess: true, ErrorMessage: null });
     } catch (e: any) {
       console.log(e);
-      res.status(RESPONSE_STATUSES.server_error).json({ IsSuccess: false, ErrorMessage: e.message });
+      res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
     }
   }
 
@@ -41,7 +40,7 @@ class OrderController {
       return res.status(200).json({ Order: updatedOrder, IsSuccess: true, ErrorMessage: null });
     } catch (e: any) {
       console.log(e);
-      res.status(RESPONSE_STATUSES.server_error).json({ IsSuccess: false, ErrorMessage: e.message });
+      res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
     }
   }
 
@@ -52,7 +51,7 @@ class OrderController {
       return res.status(204).json(order);
     } catch (e: any) {
       console.log(e);
-      res.status(RESPONSE_STATUSES.server_error).json({ IsSuccess: false, ErrorMessage: e.message });
+      res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
     }
   }
 }

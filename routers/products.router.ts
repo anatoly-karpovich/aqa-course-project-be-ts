@@ -1,6 +1,7 @@
 import Router from "express";
 import ProductsController from "../controllers/products.controller.js";
 import { productValidations, productById, deleteProduct } from "../middleware/productMiddleware.js";
+import { schemaMiddleware } from "../middleware/schemaMiddleware.js";
 
 const productsRouter = Router();
 
@@ -77,9 +78,9 @@ productsRouter.get("/products", ProductsController.getAll);
 
 productsRouter.get("/products/:id", productById, ProductsController.getProduct);
 
-productsRouter.post("/products", productValidations, ProductsController.create);
+productsRouter.post("/products", schemaMiddleware("productSchema"), productValidations, ProductsController.create);
 
-productsRouter.put("/products", productById, productValidations, ProductsController.update);
+productsRouter.put("/products", schemaMiddleware("productSchema"), productById, productValidations, ProductsController.update);
 
 productsRouter.delete("/products/:id", productById, deleteProduct, ProductsController.delete);
 

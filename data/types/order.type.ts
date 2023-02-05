@@ -1,6 +1,6 @@
 import { ORDER_STATUSES } from "../enums";
 import * as mongoose from "mongoose";
-import type { ICustomer, IProduct, IDelivery, DocumentResult } from "./";
+import type { ICustomer, IProduct, IDelivery, DocumentResult } from ".";
 
 export interface IOrder<CustomerType> {
   readonly _id?: mongoose.Types.ObjectId;

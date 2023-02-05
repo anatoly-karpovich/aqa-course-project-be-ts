@@ -1,5 +1,5 @@
 import { COUNTRIES } from "../enums";
-import { DocumentResult } from "./";
+import { DocumentResult } from ".";
 import mongoose, { Types } from "mongoose";
 
 export interface ICustomer {
@@ -8,7 +8,9 @@ export interface ICustomer {
   name: string;
   country: COUNTRIES;
   city: string;
-  address: string;
+  street: string;
+  house: number;
+  flat: number;
   phone: string;
   notes?: string;
 }
