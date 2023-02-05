@@ -4,10 +4,6 @@ import { Types } from "mongoose";
 
 class CustomerService {
   async create(customer: ICustomer): Promise<ICustomer> {
-    const existingCustomer = await Customer.findOne({ email: customer.email });
-    if (existingCustomer) {
-      throw new Error(`Customer with email '${customer.email}' already exists`);
-    }
     const createdCustomer = await Customer.create(customer);
     return createdCustomer;
   }

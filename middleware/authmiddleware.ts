@@ -16,6 +16,6 @@ export function authmiddleware(req: Request, res: Response, next: NextFunction) 
     next();
   } catch (e: any) {
     console.log(e);
-    return res.status(401).json({ ErrorMessage: "Not authorized" });
+    return res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
   }
 }

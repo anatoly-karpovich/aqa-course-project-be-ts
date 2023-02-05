@@ -4,10 +4,6 @@ import Product from "../models/product.model";
 
 class ProductsService {
   async create(product: IProduct): Promise<IProduct> {
-    const existingProduct = await Product.findOne({ name: product.name });
-    if (existingProduct) {
-      throw new Error(`Product with name '${product.name}' already exists`);
-    }
     const createdProduct = await Product.create(product);
     return createdProduct;
   }
