@@ -22,11 +22,11 @@ export async function customerValidations(req: Request, res: Response, next: Nex
       return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.STREET });
     }
 
-    if (!isValidInput("House", req.body.house) || (req.body.house < 1)) {
+    if (!isValidInput("House", req.body.house) || (req.body.house < 1) || (req.body.flat > 999)) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.HOUSE});
     }
 
-    if (!isValidInput("Flat", req.body.flat) || (req.body.flat < 1)) {
+    if (!isValidInput("Flat", req.body.flat) || (req.body.flat < 1) || (req.body.flat > 9999)) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.FLAT });
     }
 

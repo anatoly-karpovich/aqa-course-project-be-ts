@@ -21,7 +21,9 @@ const delivery = new mongoose.Schema(
     address: {
       country: { type: String, required: true },
       city: { type: String, required: true },
-      address: { type: String, required: true },
+      street: { type: String, required: true },
+      house: { type: Number, required: true },
+      flat: { type: Number, required: true },
     },
   },
   { _id: false }

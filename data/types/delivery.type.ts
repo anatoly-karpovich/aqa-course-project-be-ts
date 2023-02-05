@@ -6,6 +6,8 @@ export interface IDelivery {
   address: {
     country: COUNTRIES;
     city: string;
-    address: string;
+    street: string;
+    house: number;
+    flat: number;
   };
 }
