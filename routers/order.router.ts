@@ -8,7 +8,7 @@ const orderRouter = Router();
 orderRouter.post("/orders", schemaMiddleware("orderCreateSchema"), orderValidations, OrderController.create);
 orderRouter.get("/orders", OrderController.getAll);
 orderRouter.get("/orders/:id", orderById, OrderController.getOrder);
-orderRouter.put("/orders", schemaMiddleware("orderCreateSchema"), orderUpdateValidations, orderValidations, OrderController.update);
+orderRouter.put("/orders", schemaMiddleware("orderUpdateSchema"), orderUpdateValidations, orderValidations, OrderController.update);
 orderRouter.delete("/orders/:id", orderById, OrderController.delete);
 
 export default orderRouter;
