@@ -1,5 +1,6 @@
 import { AllowedSchema } from "express-json-validator-middleware";
 import { COUNTRIES, DELIVERY, ORDER_STATUSES } from "../enums";
+import { MAXIMUM_REQUESTED_PRODUCTS, MINIMUN_REQUESTED_PRODUCTS } from "../constants";
 
 export const orderCreateSchema: AllowedSchema = {
   type: "object",
@@ -8,8 +9,8 @@ export const orderCreateSchema: AllowedSchema = {
     requestedProducts: {
       type: "array",
       items: { type: "string" },
-      maxItems: 5,
-      minItems: 1,
+      maxItems: MAXIMUM_REQUESTED_PRODUCTS,
+      minItems: MINIMUN_REQUESTED_PRODUCTS,
     },
   },
   required: ["customer", "requestedProducts"],
@@ -23,8 +24,8 @@ export const orderUpdateSchema: AllowedSchema = {
       requestedProducts: {
         type: "array",
         items: { type: "string" },
-        maxItems: 5,
-        minItems: 1,
+        maxItems: MAXIMUM_REQUESTED_PRODUCTS,
+        minItems: MINIMUN_REQUESTED_PRODUCTS,
       },
     },
     required: ["_id" ,"customer", "requestedProducts"],
@@ -37,8 +38,8 @@ export const orderUpdateSchema: AllowedSchema = {
       requestedProducts: {
         type: "array",
         items: { type: "string" },
-        maxItems: 5,
-        minItems: 1,
+        maxItems: MAXIMUM_REQUESTED_PRODUCTS,
+        minItems: MINIMUN_REQUESTED_PRODUCTS,
       } 
     },
     required: ["_id", "receivedProducts"],

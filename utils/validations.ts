@@ -20,3 +20,7 @@ export function isValidInput(inputName: string, value: string | number) {
     return REGULAR_EXPRESSIONS[inputName].test(value);
   }
 }
+
+export function isValidDate(date: string) {
+  return !!Date.parse(date)
+}

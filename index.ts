@@ -10,7 +10,8 @@ import authRouter from "./routers/auth.router";
 import fileUpload from "express-fileupload";
 import swaggerDocs from "./utils/swagger.js";
 import orderDeliveryRouter from "./routers/orderDelivery.router";
-import { errorHandling } from "./middleware/schemaMiddleware"
+import { errorHandleMiddleware } from "./middleware/errorHandleMiddleware"
+import { authmiddleware } from "./middleware/authmiddleware";
 // import swaggerjJsdoc from 'swagger-jsdoc'
 // import swaggerUi from 'swagger-ui-express'
 // import  pkg  from './package.json' assert { type: "json" }
@@ -48,14 +49,15 @@ app.use(function (req, res, next) {
   next();
 });
 
-app.use("/api", productsRouter);
 app.use("/api", authRouter);
+app.use(authmiddleware)
+app.use("/api", productsRouter);
 app.use("/api", customerRouter);
 app.use("/api", orderRouter);
 app.use("/api", orderStatusRouter);
 app.use("/api", orderReceiveRouter);
 app.use("/api", orderDeliveryRouter);
-app.use(errorHandling)
+app.use(errorHandleMiddleware)
 
 async function startApp() {
   try {

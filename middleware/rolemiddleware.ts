@@ -11,7 +11,7 @@ export const roleMiddleware = (roles: ROLES) => {
     try {
       const token = req.headers.authorization.split(" ")[1];
       if (!token) {
-        return res.status(401).json({ ErrorMessage: "Not authorized" });
+        return res.status(401).json({ IsSuccess: false, ErrorMessage: "Not authorized" });
       }
       //TODO: investigate how to fix below code
       //@ts-ignore
@@ -23,12 +23,12 @@ export const roleMiddleware = (roles: ROLES) => {
         }
       });
       if (!hashrole) {
-        return res.status(403).json({ ErrorMessage: "Access denied" });
+        return res.status(403).json({ IsSuccess: false, ErrorMessage: "Access denied" });
       }
       next();
-    } catch (e) {
+    } catch (e: any) {
       console.log(e);
-      return res.status(403).json({ ErrorMessage: "Not authorized" });
+      return res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
     }
   };
 };

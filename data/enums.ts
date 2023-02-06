@@ -42,7 +42,7 @@ export enum VALIDATION_ERROR_MESSAGES {
   CUSTOMER_NAME = `Customer's name should contain only 1-40 alphabetical characters and one space between`,
   CITY = `City's name should contain only 1-20 alphabetical characters and one space between`,
   ADDRESS = `Address should contain only 1-20 alphanumerical characters and one space between`,
-  STREET =  `Address should contain only 1-40 alphanumerical characters and one space between`,
+  STREET =  `Street should contain only 1-40 alphanumerical characters and one space between`,
   HOUSE =  "House number should be in range 1-999",
   FLAT =  "Flat number should be in range 1-9999",
   EMAIL =  "Invalid Email Address",

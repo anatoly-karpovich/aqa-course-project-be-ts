@@ -2,7 +2,8 @@ import OrderService from "../services/order.service.js";
 import CustomerService from "../services/customer.service.js";
 import ProductsService from "../services/products.service.js";
 import { Request, Response, NextFunction } from "express";
-import { ORDER_STATUSES } from "../data/enums";
+import { ORDER_STATUSES, VALIDATION_ERROR_MESSAGES } from "../data/enums";
+import { isValidDate, isValidInput } from "../utils/validations.js";
 
 export async function orderById(req: Request, res: Response, next: NextFunction) {
   try {
@@ -132,6 +133,24 @@ export async function orderDelivery(req: Request, res: Response, next: NextFunct
     }
     if (order.status !== ORDER_STATUSES.DRAFT) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: `Invalid order status` });
+    }
+    if (!isValidDate(req.body.delivery.finalDate)) {
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: `Invalid final date` });
+    }
+    if (!isValidInput("City", req.body.delivery.address.city) || (req.body.delivery.address.city && req.body.delivery.address.city.trim().length !== req.body.delivery.address.city.length)) {
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.CITY });
+    }
+
+    if (!isValidInput("Street", req.body.delivery.address.street) || (req.body.delivery.address.street && req.body.delivery.address.street.trim().length !== req.body.delivery.address.street.length)) {
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.STREET });
+    }
+
+    if (!isValidInput("House", req.body.delivery.address.house) || req.body.delivery.address.house < 1 || req.body.delivery.address.house > 999) {
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.HOUSE });
+    }
+
+    if (!isValidInput("Flat", req.body.delivery.address.flat) || req.body.delivery.address.flat < 1 || req.body.delivery.address.flat > 9999) {
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.FLAT });
     }
   } catch (e: any) {
     return res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
