@@ -1,5 +1,6 @@
 import Router from "express";
 import ProductsController from "../controllers/products.controller.js";
+import { authmiddleware } from "../middleware/authmiddleware.js";
 import { productValidations, productById, deleteProduct } from "../middleware/productMiddleware.js";
 import { schemaMiddleware } from "../middleware/schemaMiddleware.js";
 
@@ -100,7 +101,7 @@ const productsRouter = Router();
  *                 $ref: '#/components/schemas/Product'
  */
 
-productsRouter.get("/products", ProductsController.getAll);
+productsRouter.get("/products", authmiddleware, ProductsController.getAll);
 
 /**
  * @swagger
@@ -126,7 +127,7 @@ productsRouter.get("/products", ProductsController.getAll);
  *         description: The product was not found
  */
 
-productsRouter.get("/products/:id", productById, ProductsController.getProduct);
+productsRouter.get("/products/:id", authmiddleware, productById, ProductsController.getProduct);
 
 /**
  * @swagger
@@ -153,7 +154,7 @@ productsRouter.get("/products/:id", productById, ProductsController.getProduct);
  *         description: Server error
  */
 
-productsRouter.post("/products", schemaMiddleware("productSchema"), productValidations, ProductsController.create);
+productsRouter.post("/products", authmiddleware, schemaMiddleware("productSchema"), productValidations, ProductsController.create);
 
 /**
  * @swagger
@@ -180,7 +181,7 @@ productsRouter.post("/products", schemaMiddleware("productSchema"), productValid
  *         description: Server error
  */
 
-productsRouter.put("/products", schemaMiddleware("productSchema"), productById, productValidations, ProductsController.update);
+productsRouter.put("/products", authmiddleware, schemaMiddleware("productSchema"), productById, productValidations, ProductsController.update);
 
 /**
  * @swagger
@@ -202,6 +203,6 @@ productsRouter.put("/products", schemaMiddleware("productSchema"), productById, 
  *         description: The product was not found
  */
 
-productsRouter.delete("/products/:id", productById, deleteProduct, ProductsController.delete);
+productsRouter.delete("/products/:id", authmiddleware, productById, deleteProduct, ProductsController.delete);
 
 export default productsRouter;
