@@ -138,19 +138,19 @@ export async function orderDelivery(req: Request, res: Response, next: NextFunct
       return res.status(400).json({ IsSuccess: false, ErrorMessage: `Invalid final date` });
     }
     if (!isValidInput("City", req.body.delivery.address.city) || (req.body.delivery.address.city && req.body.delivery.address.city.trim().length !== req.body.delivery.address.city.length)) {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.CITY });
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.DELIVERY });
     }
 
     if (!isValidInput("Street", req.body.delivery.address.street) || (req.body.delivery.address.street && req.body.delivery.address.street.trim().length !== req.body.delivery.address.street.length)) {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.STREET });
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.DELIVERY });
     }
 
     if (!isValidInput("House", req.body.delivery.address.house) || req.body.delivery.address.house < 1 || req.body.delivery.address.house > 999) {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.HOUSE });
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.DELIVERY });
     }
 
     if (!isValidInput("Flat", req.body.delivery.address.flat) || req.body.delivery.address.flat < 1 || req.body.delivery.address.flat > 9999) {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.FLAT });
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.DELIVERY });
     }
   } catch (e: any) {
     return res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });

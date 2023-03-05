@@ -11,38 +11,38 @@ export async function customerValidations(req: Request, res: Response, next: Nex
     }
 
     if (!isValidInput("Name", req.body.name) || (req.body.name && req.body.name.trim().length !== req.body.name.length)) {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.CUSTOMER_NAME });
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
     }
 
     if (!isValidInput("City", req.body.city) || (req.body.city && req.body.city.trim().length !== req.body.city.length)) {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.CITY });
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
     }
 
     if (!isValidInput("Street", req.body.street) || (req.body.street && req.body.street.trim().length !== req.body.street.length)) {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.STREET });
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
     }
 
-    if (!isValidInput("House", req.body.house) || (req.body.house < 1) || (req.body.flat > 999)) {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.HOUSE});
+    if (!isValidInput("House", req.body.house) || (req.body.house < 1) || (req.body.house > 999)) {
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY});
     }
 
     if (!isValidInput("Flat", req.body.flat) || (req.body.flat < 1) || (req.body.flat > 9999)) {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.FLAT });
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
     }
 
     if (!isValidInput("Email", req.body.email) || (req.body.email && req.body.email.trim().length !== req.body.email.length)) {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.EMAIL });
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
     }
 
     if (!isValidInput("Phone", req.body.phone) || (req.body.phone && req.body.phone.trim().length !== req.body.phone.length)) {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.PHONE });
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
     }
 
     if (!Object.values(COUNTRIES).includes(req.body.country) || (req.body.country && req.body.country.trim().length !== req.body.country.length)) {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.COUNTRY });
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
     }
     if (req.body.notes && (!isValidInput("Notes", req.body.notes) || req.body.notes.trim().length !== req.body.notes.length)) {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.NOTES });
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
     }
 
     next();

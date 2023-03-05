@@ -53,4 +53,8 @@ export enum VALIDATION_ERROR_MESSAGES {
   PRICE =  "Price should be in range 1-99999",
   COUNTRY =  "No such country is defined",
   MANUFACTURER = "No such manufacturer is defined",
+  CUSTOMER = "Incorrect Customer",
+  PRODUCT = "Incorrect Customer",
+  DELIVERY = 'Incorrect Delivery',
+  BODY = "Incorrect request body"
 };

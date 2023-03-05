@@ -10,8 +10,9 @@ import authRouter from "./routers/auth.router";
 import fileUpload from "express-fileupload";
 import swaggerDocs from "./utils/swagger.js";
 import orderDeliveryRouter from "./routers/orderDelivery.router";
-import { errorHandleMiddleware } from "./middleware/errorHandleMiddleware"
+import { errorHandleMiddleware } from "./middleware/errorHandleMiddleware";
 import { authmiddleware } from "./middleware/authmiddleware";
+import cors from 'cors'
 // import swaggerjJsdoc from 'swagger-jsdoc'
 // import swaggerUi from 'swagger-ui-express'
 // import  pkg  from './package.json' assert { type: "json" }
@@ -27,37 +28,46 @@ const app = express();
 
 const BASE_URL = process.env.ENVIRONMENT;
 
+const cors_options: cors.CorsOptions = {
+  // origin: ["http://127.0.0.1:5502", "https://anatoly-karpovich.github.io"],
+    "origin": "*",
+    "methods": "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+    "preflightContinue": false,
+    "optionsSuccessStatus": 200
+};
+
+// app.use(function (req, res, next) {
+//   // Website you wish to allow to connect
+//   res.setHeader("Access-Control-Allow-Origin", "http://127.0.0.1:5502");
+//   // res.setHeader("Access-Control-Allow-Origin", "*");
+
+//   // Request methods you wish to allow
+//   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
+
+//   // Request headers you wish to allow
+//   res.setHeader("Access-Control-Allow-Headers", ["Authorization", "X-Requested-With,content-type"]);
+
+//   // Set to true if you need the website to include cookies in the requests sent
+//   // to the API (e.g. in case you use sessions)
+//   res.setHeader("Access-Control-Allow-Credentials", "true");
+
+//   // Pass to next layer of middleware
+//   next();
+// });
+app.use(cors(cors_options))
+app.options("*", cors());
 app.use(express.json());
 app.use(express.static("static"));
 app.use(fileUpload({}));
-
-app.use(function (req, res, next) {
-  // Website you wish to allow to connect
-  res.setHeader("Access-Control-Allow-Origin", BASE_URL);
-
-  // Request methods you wish to allow
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
-
-  // Request headers you wish to allow
-  res.setHeader("Access-Control-Allow-Headers", "X-Requested-With,content-type");
-
-  // Set to true if you need the website to include cookies in the requests sent
-  // to the API (e.g. in case you use sessions)
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-
-  // Pass to next layer of middleware
-  next();
-});
-
 app.use("/api", authRouter);
-app.use(authmiddleware)
+app.use(authmiddleware);
 app.use("/api", productsRouter);
 app.use("/api", customerRouter);
 app.use("/api", orderRouter);
 app.use("/api", orderStatusRouter);
 app.use("/api", orderReceiveRouter);
 app.use("/api", orderDeliveryRouter);
-app.use(errorHandleMiddleware)
+app.use(errorHandleMiddleware);
 
 async function startApp() {
   try {

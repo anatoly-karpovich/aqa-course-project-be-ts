@@ -1,5 +1,6 @@
 import { NextFunction, Response, Request } from "express";
 import { ValidationError } from "express-json-validator-middleware";
+import { VALIDATION_ERROR_MESSAGES } from "../data/enums";
 
 export function errorHandleMiddleware(error, req: Request, res: Response, next: NextFunction) {
     // Check the error is a validation error
@@ -7,7 +8,7 @@ export function errorHandleMiddleware(error, req: Request, res: Response, next: 
       // Handle the error
       res.status(400).send({
         isSuccess: false,
-        ErrorMessage: "Incorrect request body",
+        ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY,
         SchemaErrors: error.validationErrors.body,
       });
       next();

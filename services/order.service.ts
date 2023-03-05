@@ -71,12 +71,13 @@ class OrderService {
     return { ...updatedOrder._doc, customer };
   }
 
-  async delete(id: Types.ObjectId): Promise<IOrder<Types.ObjectId>> {
+  async delete(id: Types.ObjectId): Promise<IOrder<ICustomer>> {
     if (!id) {
       throw new Error("Id was not provided");
     }
     const order = await Order.findByIdAndDelete(id);
-    return order;
+    const customer = await CustomerService.getCustomer(order.customer);
+    return { ...order._doc, customer }
   }
 }
 

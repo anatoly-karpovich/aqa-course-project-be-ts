@@ -5,8 +5,6 @@ import { schemaMiddleware } from "../middleware/schemaMiddleware.js";
 
 const productsRouter = Router();
 
-// productsRouter.post('/products', authmiddleware, productMiddleware, ProductsController.create)
-
 /**
  * @swagger
  * components:
@@ -37,9 +35,6 @@ const productsRouter = Router();
  *         notes:
  *           type: string
  *           description: The products notes
- *         __v:
- *           type: number,
- *           desctiption: Data version in mongoDB, no need to send any time
  *       example:
  *         "_id": "6396593e54206d313b2a50b7"
  *         "name": "product 1"
@@ -47,7 +42,36 @@ const productsRouter = Router();
  *         "price": 1
  *         "manufacturer": "Apple"
  *         "notes": "note 1"
- *         "__v": 0
+ * 
+ *     Product without id:
+ *       type: object
+ *       required:
+ *         - name
+ *         - amount
+ *         - price
+ *         - manufacturer
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: The products name
+ *         amount:
+ *           type: number
+ *           description: The products amount
+ *         price:
+ *           type: number
+ *           description: The products price
+ *         manufacturer:
+ *           type: string
+ *           description: The products manufactirer
+ *         notes:
+ *           type: string
+ *           description: The products notes
+ *       example:
+ *         "name": "product 1"
+ *         "amount": 1
+ *         "price": 1
+ *         "manufacturer": "Apple"
+ *         "notes": "note 1"
  */
 
 /**
@@ -59,10 +83,12 @@ const productsRouter = Router();
 
 /**
  * @swagger
- * /api/Products:
+ * /api/products:
  *   get:
- *     summary: Returns the list of all the Products
+ *     summary: Get the list of products
  *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: The list of the products
@@ -76,11 +102,105 @@ const productsRouter = Router();
 
 productsRouter.get("/products", ProductsController.getAll);
 
+/**
+ * @swagger
+ * /api/products/{id}:
+ *   get:
+ *     summary: Get the product by Id
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The product id
+ *     responses:
+ *       200:
+ *         description: The product by Id
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Product'
+ *       404:
+ *         description: The product was not found
+ */
+
 productsRouter.get("/products/:id", productById, ProductsController.getProduct);
+
+/**
+ * @swagger
+ * /api/products:
+ *   post:
+ *     summary: Create a new product
+ *     tags: [Products]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Product without id'
+ *     responses:
+ *       200:
+ *         description: The product was seccessfully created
+ *         content:
+ *           application/json:
+ *             schema:
+ *             $ref: '#/components/schemas/Product'
+ *       400:
+ *         description: Validation error
+ *       500:
+ *         description: Server error
+ */
 
 productsRouter.post("/products", schemaMiddleware("productSchema"), productValidations, ProductsController.create);
 
+/**
+ * @swagger
+ * /api/products:
+ *   put:
+ *     summary: Update the product by id
+ *     tags: [Products]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Product'
+ *     responses:
+ *       200:
+ *         description: The product was seccessfully updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *             $ref: '#/components/schemas/Product'
+ *       400:
+ *         description: Validation error
+ *       500:
+ *         description: Server error
+ */
+
 productsRouter.put("/products", schemaMiddleware("productSchema"), productById, productValidations, ProductsController.update);
+
+/**
+ * @swagger
+ * /api/products/{id}:
+ *   delete:
+ *     summary: Delete the product by id
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The product id
+ *     responses:
+ *       204:
+ *         description: The product successfully deleted
+ *       404:
+ *         description: The product was not found
+ */
 
 productsRouter.delete("/products/:id", productById, deleteProduct, ProductsController.delete);
 

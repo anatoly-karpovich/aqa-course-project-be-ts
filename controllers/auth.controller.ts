@@ -44,11 +44,11 @@ class AuthController {
       const { username, password } = req.body;
       const user = await User.findOne({ username });
       if (!user) {
-        return res.status(400).json({ IsSuccess: false, ErrorMessage: `User with username '${username}' wasn't found` });
+        return res.status(400).json({ IsSuccess: false, ErrorMessage: `Incorrect credentials` });
       }
       const isValidPassword = bcrypt.compareSync(password, user.password);
       if (!isValidPassword) {
-        return res.status(400).json({ IsSuccess: false, ErrorMessage: `Incorrect password for user '${username}' was provided` });
+        return res.status(400).json({ IsSuccess: false, ErrorMessage: `Incorrect credentials` });
       }
       const token = generateAccessToken(user._id, user.roles);
       return res.json({ token });

@@ -10,20 +10,20 @@ export async function productValidations(req: Request, res: Response, next: Next
       return res.status(409).json({ IsSuccess: false, ErrorMessage: `Product with name '${req.body.name}' already exists` });
     }
 
-    if (!isValidInput("Product Name", req.body.name)) {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.PRODUCTS_NAME });
+    if (!isValidInput("Product Name", req.body.name) || req.body.name.trim().length !== req.body.name.length) {
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
     }
-    if (!isValidInput("Amount", req.body.amount) && req.body.amount < 0) {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.AMOUNT });
+    if (!isValidInput("Amount", req.body.amount) || req.body.amount < 0 || req.body.amount > 999) {
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
     }
-    if (!isValidInput("Price", req.body.price) && req.body.price <= 0) {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.PRICE });
+    if (!isValidInput("Price", req.body.price) || req.body.price <= 0 || req.body.price > 99999) {
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
     }
-    if (req.body.notes && !isValidInput("Notes", req.body.notes)) {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.NOTES });
+    if (req.body.notes && (!isValidInput("Notes", req.body.notes) || req.body.notes.trim().length !== req.body.notes.length)) {
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
     }
     if (!Object.values(MANUFACTURERS).includes(req.body.manufacturer)) {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.MANUFACTURER });
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
     }
     next();
   } catch (e: any) {

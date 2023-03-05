@@ -44,11 +44,11 @@ class OrderController {
     }
   }
 
-  async delete(req: Request, res: Response) {
+  async delete(req: Request, res: Response):Promise<Response<any, Record<string, any>>> {
     try {
       const id = new mongoose.Types.ObjectId(req.params.id);
       const order = await OrderService.delete(id);
-      return res.status(204).json(order);
+      return res.status(204).json({ Order: order, IsSuccess: false, ErrorMessage: null });
     } catch (e: any) {
       console.log(e);
       res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
