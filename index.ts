@@ -60,7 +60,7 @@ app.use(express.json());
 app.use(express.static("static"));
 app.use(fileUpload({}));
 app.use("/api", authRouter);
-app.use(authmiddleware);
+// app.use(authmiddleware);
 app.use("/api", productsRouter);
 app.use("/api", customerRouter);
 app.use("/api", orderRouter);
