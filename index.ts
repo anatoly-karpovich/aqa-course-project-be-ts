@@ -75,7 +75,7 @@ async function startApp() {
     app.listen(PORT, () => {
       console.log("Server started on port " + PORT);
     });
-    swaggerDocs(app, PORT);
+    swaggerDocs(app);
   } catch (e) {
     console.log(e);
   }

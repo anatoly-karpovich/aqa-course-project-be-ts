@@ -7,8 +7,8 @@ const { version } = pkg;
 
 const url = ``
 
-const options = (port: number) => {
-  return {
+const options = {
+  
     definition: {
       openapi: "3.0.0",
       info: {
@@ -18,7 +18,7 @@ const options = (port: number) => {
       },
       servers: [
         {
-          url: url || `http://localhost:${port}`,
+          url: `https://aqa-course-project.app/`,
         },
       ],
       components: {
@@ -38,10 +38,9 @@ const options = (port: number) => {
     },
     apis: ["./dist/routers/*.router.js"],
   };
-};
 
-function swaggerDocs(app: Express, port: number) {
-  const swaggerSpec = swaggerjJsdoc(options(port));
+function swaggerDocs(app: Express) {
+  const swaggerSpec = swaggerjJsdoc(options);
   //Swagger Page
   app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 

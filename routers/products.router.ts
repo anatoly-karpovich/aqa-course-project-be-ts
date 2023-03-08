@@ -1,7 +1,7 @@
 import Router from "express";
 import ProductsController from "../controllers/products.controller.js";
 import { authmiddleware } from "../middleware/authmiddleware.js";
-import { productValidations, productById, deleteProduct } from "../middleware/productMiddleware.js";
+import { productValidations, productById, deleteProduct, uniqueProduct } from "../middleware/productMiddleware.js";
 import { schemaMiddleware } from "../middleware/schemaMiddleware.js";
 
 const productsRouter = Router();
@@ -154,7 +154,7 @@ productsRouter.get("/products/:id", authmiddleware, productById, ProductsControl
  *         description: Server error
  */
 
-productsRouter.post("/products", authmiddleware, schemaMiddleware("productSchema"), productValidations, ProductsController.create);
+productsRouter.post("/products", authmiddleware, schemaMiddleware("productSchema"), uniqueProduct, productValidations, ProductsController.create);
 
 /**
  * @swagger
@@ -181,7 +181,7 @@ productsRouter.post("/products", authmiddleware, schemaMiddleware("productSchema
  *         description: Server error
  */
 
-productsRouter.put("/products", authmiddleware, schemaMiddleware("productSchema"), productById, productValidations, ProductsController.update);
+productsRouter.put("/products", authmiddleware, schemaMiddleware("productSchema"), uniqueProduct, productById, productValidations, ProductsController.update);
 
 /**
  * @swagger

@@ -4,11 +4,20 @@ import ProductsService from "../services/products.service.js";
 import { Request, Response, NextFunction } from "express";
 import OrderService from "../services/order.service.js";
 
+export async function uniqueProduct(req: Request, res: Response, next: NextFunction) {
+  const product = (await ProductsService.getAll()).find((c) => {
+    return req.body._id 
+    ? (c.name === req.body.name && c._id.toString() !== req.body._id)
+    : c.name === req.body.name
+  })
+  if (product) {
+    return res.status(409).json({ IsSuccess: false, ErrorMessage: `Product with name '${req.body.name}' already exists` });
+  }
+  next();
+}
+
 export async function productValidations(req: Request, res: Response, next: NextFunction) {
   try {
-    if ((await ProductsService.getAll()).find((c) => c.name === req.body.name)) {
-      return res.status(409).json({ IsSuccess: false, ErrorMessage: `Product with name '${req.body.name}' already exists` });
-    }
 
     if (!isValidInput("Product Name", req.body.name) || req.body.name.trim().length !== req.body.name.length) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });

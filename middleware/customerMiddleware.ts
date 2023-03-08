@@ -4,12 +4,21 @@ import CustomerService from "../services/customer.service.js";
 import Order from "../models/order.model.js";
 import { Request, Response, NextFunction } from "express";
 
+export async function uniqueCustomer(req: Request, res: Response, next: NextFunction) {
+  const customer = (await CustomerService.getAll()).find((c) => {
+    return req.body._id 
+    ? (c.email === req.body.email && c._id.toString() !== req.body._id)
+    : c.email === req.body.email
+  })
+  if (customer) {
+    console.log(customer)
+    return res.status(409).json({ IsSuccess: false, ErrorMessage: `Customer with email '${req.body.email}' already exists` });
+  }
+  next();
+}
+
 export async function customerValidations(req: Request, res: Response, next: NextFunction) {
   try {
-    if ((await CustomerService.getAll()).find((c) => c.email === req.body.email)) {
-      return res.status(409).json({ IsSuccess: false, ErrorMessage: `Customer with email '${req.body.email}' already exists` });
-    }
-
     if (!isValidInput("Name", req.body.name) || (req.body.name && req.body.name.trim().length !== req.body.name.length)) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
     }
