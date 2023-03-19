@@ -27,7 +27,7 @@ class OrderReceiveService {
     orderFromDB.history.push({
       ..._.omit(orderFromDB, ["history", "notReceivedProducts", "createdOn", "_id"]),
       customer: orderFromDB.customer._id.toString(),
-      changedOn: getTodaysDate(),
+      changedOn: Date.now(),
     });
     const updatedOrder = await Order.findByIdAndUpdate(order._id, orderFromDB, { new: true });
     const customer = await CustomerService.getCustomer(updatedOrder.customer);
