@@ -7,6 +7,7 @@ const ProductSchema = new mongoose.Schema({
   amount: { type: Number, required: true },
   price: { type: Number, required: true },
   manufacturer: { type: String, enum: MANUFACTURERS, required: true },
+  createdOn: { type: Number, required: true},
   notes: { type: String, required: false },
 }, { versionKey: false });
 

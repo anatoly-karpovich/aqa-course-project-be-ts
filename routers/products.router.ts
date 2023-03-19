@@ -32,6 +32,7 @@ const productsRouter = Router();
  *           description: The products price
  *         manufacturer:
  *           type: string
+ *           enum: [Apple, Samsung, Google, Microsoft, Sony, Xiaomi, Amazon, Tesla]
  *           description: The products manufactirer
  *         notes:
  *           type: string
@@ -63,6 +64,7 @@ const productsRouter = Router();
  *           description: The products price
  *         manufacturer:
  *           type: string
+ *           enum: [Apple, Samsung, Google, Microsoft, Sony, Xiaomi, Amazon, Tesla]
  *           description: The products manufactirer
  *         notes:
  *           type: string
@@ -177,6 +179,8 @@ productsRouter.post("/products", authmiddleware, schemaMiddleware("productSchema
  *             $ref: '#/components/schemas/Product'
  *       400:
  *         description: Validation error
+ *       409:
+ *         description: Conflict error
  *       500:
  *         description: Server error
  */
@@ -201,6 +205,8 @@ productsRouter.put("/products", authmiddleware, schemaMiddleware("productSchema"
  *         description: The product successfully deleted
  *       404:
  *         description: The product was not found
+ *       409:
+ *         description: Conflict error
  */
 
 productsRouter.delete("/products/:id", authmiddleware, productById, deleteProduct, ProductsController.delete);

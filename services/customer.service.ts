@@ -4,13 +4,13 @@ import { Types } from "mongoose";
 
 class CustomerService {
   async create(customer: ICustomer): Promise<ICustomer> {
-    const createdCustomer = await Customer.create(customer);
+    const createdCustomer = await Customer.create({...customer, createdOn: Date.now()});
     return createdCustomer;
   }
 
   async getAll(): Promise<ICustomer[]> {
-    const customer = await Customer.find();
-    return customer;
+    const customers = await Customer.find();
+    return customers.reverse();
   }
 
   async getCustomer(id: Types.ObjectId): Promise<ICustomer> {

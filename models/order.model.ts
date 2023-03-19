@@ -37,7 +37,7 @@ const history = new mongoose.Schema(
     receivedProducts: [{ type: product, required: true }],
     total_price: { type: Number, require: true },
     delivery: { type: delivery, required: false },
-    changedOn: { type: Date, required: true },
+    changedOn: { type: Number, required: true },
   },
   { _id: false }
 );

@@ -5,15 +5,19 @@ import Order from "../models/order.model.js";
 import { Request, Response, NextFunction } from "express";
 
 export async function uniqueCustomer(req: Request, res: Response, next: NextFunction) {
-  const customer = (await CustomerService.getAll()).find((c) => {
-    return req.body._id 
-    ? (c.email === req.body.email && c._id.toString() !== req.body._id)
-    : c.email === req.body.email
-  })
-  if (customer) {
-    console.log(customer)
-    return res.status(409).json({ IsSuccess: false, ErrorMessage: `Customer with email '${req.body.email}' already exists` });
-  }
+  try {
+    const customer = (await CustomerService.getAll()).find((c) => {
+      return req.body._id 
+      ? (c.email === req.body.email && c._id.toString() !== req.body._id)
+      : c.email === req.body.email
+    })
+    if (customer) {
+      return res.status(409).json({ IsSuccess: false, ErrorMessage: `Customer with email '${req.body.email}' already exists` });
+    }
+  } catch (e: any) {
+    console.log(e);
+    return res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
+  }  
   next();
 }
 

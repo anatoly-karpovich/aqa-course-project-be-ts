@@ -4,13 +4,13 @@ import Product from "../models/product.model";
 
 class ProductsService {
   async create(product: IProduct): Promise<IProduct> {
-    const createdProduct = await Product.create(product);
+    const createdProduct = await Product.create({...product, createdOn: Date.now()});
     return createdProduct;
   }
 
   async getAll(): Promise<IProduct[]> {
     const products = await Product.find();
-    return products;
+    return products.reverse();
   }
 
   async getProduct(id: Types.ObjectId): Promise<IProduct> {

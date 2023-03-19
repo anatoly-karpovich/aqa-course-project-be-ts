@@ -11,6 +11,7 @@ const CustomerSchema = new mongoose.Schema({
   house: { type: Number, required: true },
   flat: { type: Number, required: true },
   phone: { type: String, required: true },
+  createdOn: { type: Number, required: true},
   notes: { type: String, required: false },
 }, { versionKey: false });
 

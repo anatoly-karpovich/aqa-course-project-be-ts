@@ -16,7 +16,7 @@ class OrderService {
       notReceivedProducts: requestedProducts,
       delivery: null,
       total_price: getTotalPrice(requestedProducts),
-      createdOn: getTodaysDate(),
+      createdOn: Date.now(),
       receivedProducts: [],
       history: [],
     };
@@ -35,7 +35,7 @@ class OrderService {
         customer: await CustomerService.getCustomer(order.customer),
       };
     });
-    return Promise.all(orders);
+    return (await Promise.all(orders)).reverse();
   }
 
   async getOrder(id: Types.ObjectId): Promise<IOrder<ICustomer>> {

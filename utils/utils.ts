@@ -20,7 +20,7 @@ export function createHistoryEntry<T extends Omit<IHistory, "changedOn">>(order:
     customer: order.customer.toString(),
     delivery: order.delivery,
     total_price: order.total_price,
-    changedOn: getTodaysDate()
+    changedOn: Date.now()
   };
 }
 

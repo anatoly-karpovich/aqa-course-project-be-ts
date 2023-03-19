@@ -11,7 +11,7 @@ export interface IOrder<CustomerType> {
   receivedProducts: IProduct[];
   delivery: IDelivery | null;
   total_price: number;
-  createdOn: string;
+  createdOn: number;
   history: IHistory[];
 }
 
@@ -32,5 +32,5 @@ export interface IHistory {
   readonly receivedProducts: IProduct[];
   readonly delivery: IDelivery | null;
   readonly total_price: number;
-  readonly changedOn: string;
+  readonly changedOn: number;
 }

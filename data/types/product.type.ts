@@ -8,6 +8,7 @@ export interface IProduct extends DocumentResult<IProduct> {
   amount: number;
   price: number;
   manufacturer: MANUFACTURERS;
+  createdOn: number;
   notes?: string;
 }
 

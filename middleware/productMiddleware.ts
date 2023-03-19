@@ -5,6 +5,7 @@ import { Request, Response, NextFunction } from "express";
 import OrderService from "../services/order.service.js";
 
 export async function uniqueProduct(req: Request, res: Response, next: NextFunction) {
+  try {
   const product = (await ProductsService.getAll()).find((c) => {
     return req.body._id 
     ? (c.name === req.body.name && c._id.toString() !== req.body._id)
@@ -13,6 +14,10 @@ export async function uniqueProduct(req: Request, res: Response, next: NextFunct
   if (product) {
     return res.status(409).json({ IsSuccess: false, ErrorMessage: `Product with name '${req.body.name}' already exists` });
   }
+} catch (e: any) {
+  console.log(e);
+  return res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
+}  
   next();
 }
 
@@ -46,7 +51,7 @@ export async function productById(req: Request, res: Response, next: NextFunctio
     const id = req.body._id || req.params.id;
     const product = await ProductsService.getProduct(id);
     if (!product) {
-      return res.status(404).json({ ErrorMessage: `Product with id '${id}' wasn't found` });
+      return res.status(404).json({ IsSuccess: false, ErrorMessage: `Product with id '${id}' wasn't found` });
     }
     next();
   } catch (e: any) {
