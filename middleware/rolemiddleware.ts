@@ -13,9 +13,7 @@ export const roleMiddleware = (roles: ROLES) => {
       if (!token) {
         return res.status(401).json({ IsSuccess: false, ErrorMessage: "Not authorized" });
       }
-      //TODO: investigate how to fix below code
-      //@ts-ignore
-      const { roles: userRoles } = jsonwebtoken.verify(token, process.env.SECRET_KEY);
+      const { roles: userRoles } = jsonwebtoken.verify(token, process.env.SECRET_KEY) as jsonwebtoken.JwtPayload;
       let hashrole = false;
       userRoles.forEach((role) => {
         if (roles.includes(role)) {

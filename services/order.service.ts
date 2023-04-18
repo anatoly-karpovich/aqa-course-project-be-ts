@@ -2,7 +2,7 @@ import Order from "../models/order.model";
 import CustomerService from "./customer.service";
 import { IOrder, IOrderRequest, ICustomer } from "../data/types";
 import type { Types } from "mongoose";
-import { getTotalPrice, getTodaysDate, createHistoryEntry, productsMapping } from "../utils/utils";
+import { getTotalPrice, createHistoryEntry, productsMapping } from "../utils/utils";
 import { ORDER_STATUSES } from "../data/enums";
 import _ from "lodash";
 

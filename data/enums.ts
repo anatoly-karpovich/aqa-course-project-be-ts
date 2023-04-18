@@ -11,7 +11,7 @@ export enum COUNTRIES {
 
 export enum DELIVERY {
   DELIVERY = "Delivery",
-  PICK_UP = "Pick Up",
+  PICK_UP = "Pickup",
 }
 
 export enum MANUFACTURERS {
