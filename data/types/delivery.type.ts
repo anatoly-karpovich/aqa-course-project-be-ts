@@ -1,7 +1,7 @@
 import { COUNTRIES, DELIVERY } from "../enums";
 
 export interface IDelivery {
-  finalDate: Date;
+  finalDate: string;
   condition: DELIVERY;
   address: {
     country: COUNTRIES;

@@ -24,7 +24,7 @@ export async function orderValidations(req: Request, res: Response, next: NextFu
     return res.status(404).json({ IsSuccess: false, ErrorMessage: `Missing customer` });
   }
 
-  if (!req.body.requestedProducts || !req.body.requestedProducts.length) {
+  if (!req.body.products || !req.body.products.length) {
     return res.status(404).json({ IsSuccess: false, ErrorMessage: `Missing products` });
   }
 
@@ -34,7 +34,7 @@ export async function orderValidations(req: Request, res: Response, next: NextFu
       return res.status(404).json({ IsSuccess: false, ErrorMessage: `Customer with id '${req.body.customer}' wasn't found` });
     }
 
-    for (const p of req.body.requestedProducts) {
+    for (const p of req.body.products) {
       const product = await ProductsService.getProduct(p);
       if (!product) {
         return res.status(404).json({ IsSuccess: false, ErrorMessage: `Product with id '${p}' wasn't found` });
@@ -100,7 +100,7 @@ export async function orderReceiveValidations(req: Request, res: Response, next:
       return res.status(404).json({ IsSuccess: false, ErrorMessage: `Order with id '${req.body._id}' wasn't found` });
     }
 
-    if (!req.body.receivedProducts.length) {
+    if (!req.body.products.length) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: `Incorrect amount of received products` });
     }
 
@@ -108,12 +108,12 @@ export async function orderReceiveValidations(req: Request, res: Response, next:
       return res.status(400).json({ IsSuccess: false, ErrorMessage: `Invalid order status` });
     }
 
-    if (req.body.receivedProducts.length > order.requestedProducts.length) {
+    if (req.body.products.length > order.products.length) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: `Incorrect amount of received products` });
     }
 
-    for (const product of req.body.receivedProducts) {
-      if (!order.requestedProducts.find((el) => el._id.toString() === product)) {
+    for (const product of req.body.products) {
+      if (!order.products.find((el) => el._id.toString() === product)) {
         return res.status(400).json({ IsSuccess: false, ErrorMessage: `Product with Id '${product}' is not requested` });
       }
     }

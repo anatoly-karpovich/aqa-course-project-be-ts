@@ -2,26 +2,24 @@ import Order from "../models/order.model";
 import CustomerService from "./customer.service";
 import { IOrder, IOrderRequest, ICustomer } from "../data/types";
 import type { Types } from "mongoose";
-import { getTotalPrice, createHistoryEntry, productsMapping } from "../utils/utils";
-import { ORDER_STATUSES } from "../data/enums";
+import { getTotalPrice, createHistoryEntry, productsMapping, getTodaysDate } from "../utils/utils";
+import { ORDER_HISTORY_ACTIONS, ORDER_STATUSES } from "../data/enums";
 import _ from "lodash";
 
 class OrderService {
   async create(order: IOrderRequest): Promise<IOrder<ICustomer>> {
-    const requestedProducts = await productsMapping(order);
+    const products = await productsMapping(order);
+    let action = ORDER_HISTORY_ACTIONS.CREATED 
     const newOrder: IOrder<string> = {
       status: ORDER_STATUSES.DRAFT,
       customer: order.customer.toString(),
-      requestedProducts,
-      notReceivedProducts: requestedProducts,
+      products,
       delivery: null,
-      total_price: getTotalPrice(requestedProducts),
-      createdOn: Date.now(),
-      receivedProducts: [],
+      total_price: getTotalPrice(products),
+      createdOn: getTodaysDate(true),
       history: [],
     };
-    newOrder.history.push(createHistoryEntry(newOrder));
-
+    newOrder.history.unshift(createHistoryEntry(newOrder, action));
     const createdOrder = await Order.create(newOrder);
     const customer = await CustomerService.getCustomer(createdOrder.customer);
     return { ...createdOrder._doc, customer };
@@ -51,21 +49,27 @@ class OrderService {
   }
 
   async update(order: IOrderRequest): Promise<IOrder<ICustomer>> {
-    const requestedProducts = await productsMapping(order);
+    const products = await productsMapping(order);
     const orderFromDb = await this.getOrder(order._id);
     const newOrder: IOrder<string> = {
       status: ORDER_STATUSES.DRAFT,
       customer: order.customer.toString(),
-      requestedProducts,
-      receivedProducts: orderFromDb.receivedProducts,
+      products,
       delivery: orderFromDb.delivery,
-      notReceivedProducts: [...requestedProducts],
-      total_price: getTotalPrice(requestedProducts),
+      total_price: getTotalPrice(products),
       history: orderFromDb.history,
       createdOn: orderFromDb.createdOn,
     };
-    newOrder.history.push(createHistoryEntry(newOrder));
-
+    if(!_.isEqual(order.products, orderFromDb.products.map(p => p._id.toString()))) {
+      const o = _.cloneDeep(newOrder)
+      o.customer = orderFromDb.customer._id.toString()
+      newOrder.history.unshift(createHistoryEntry(o, ORDER_HISTORY_ACTIONS.REQUIRED_PRODUCTS_CHANGED));
+    };
+    if(!_.isEqual(order.customer.toString(), orderFromDb.customer._id.toString())) {
+      const o = _.cloneDeep(newOrder)
+      o.products = [...orderFromDb.products]
+      newOrder.history.unshift(createHistoryEntry(o, ORDER_HISTORY_ACTIONS.CUSTOMER_CHANGED));
+    };
     const updatedOrder = await Order.findByIdAndUpdate(order._id, newOrder, { new: true });
     const customer = await CustomerService.getCustomer(updatedOrder.customer);
     return { ...updatedOrder._doc, customer };

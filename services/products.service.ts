@@ -1,10 +1,11 @@
 import { Types } from "mongoose";
 import type { IProduct } from "../data/types";
 import Product from "../models/product.model";
+import { getTodaysDate } from "../utils/utils";
 
 class ProductsService {
   async create(product: IProduct): Promise<IProduct> {
-    const createdProduct = await Product.create({...product, createdOn: Date.now()});
+    const createdProduct = await Product.create({...product, createdOn: getTodaysDate(true)});
     return createdProduct;
   }
 

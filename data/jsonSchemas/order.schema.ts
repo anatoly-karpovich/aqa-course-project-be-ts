@@ -6,14 +6,14 @@ export const orderCreateSchema: AllowedSchema = {
   type: "object",
   properties: {
     customer: { type: "string" },
-    requestedProducts: {
+    products: {
       type: "array",
       items: { type: "string" },
       maxItems: MAXIMUM_REQUESTED_PRODUCTS,
       minItems: MINIMUN_REQUESTED_PRODUCTS,
     },
   },
-  required: ["customer", "requestedProducts"],
+  required: ["customer", "products"],
 };
 
 export const orderUpdateSchema: AllowedSchema = {
@@ -21,28 +21,28 @@ export const orderUpdateSchema: AllowedSchema = {
     properties: {
       _id: { type: "string" },
       customer: { type: "string" },
-      requestedProducts: {
+      products: {
         type: "array",
         items: { type: "string" },
         maxItems: MAXIMUM_REQUESTED_PRODUCTS,
         minItems: MINIMUN_REQUESTED_PRODUCTS,
       },
     },
-    required: ["_id" ,"customer", "requestedProducts"],
+    required: ["_id" ,"customer", "products"],
   };
 
   export const orderReceiveSchema: AllowedSchema = {
     type: "object",
     properties: {
       _id: { type: "string" },
-      requestedProducts: {
+      products: {
         type: "array",
         items: { type: "string" },
         maxItems: MAXIMUM_REQUESTED_PRODUCTS,
         minItems: MINIMUN_REQUESTED_PRODUCTS,
       } 
     },
-    required: ["_id", "receivedProducts"],
+    required: ["_id", "products"],
   };
 
   export const orderStatusSchema: AllowedSchema = {

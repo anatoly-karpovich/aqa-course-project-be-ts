@@ -1,10 +1,11 @@
 import Customer from "../models/customer.model";
 import type { ICustomer } from "../data/types";
 import { Types } from "mongoose";
+import { getTodaysDate } from "../utils/utils";
 
 class CustomerService {
   async create(customer: ICustomer): Promise<ICustomer> {
-    const createdCustomer = await Customer.create({...customer, createdOn: Date.now()});
+    const createdCustomer = await Customer.create({...customer, createdOn: getTodaysDate(true)});
     return createdCustomer;
   }
 

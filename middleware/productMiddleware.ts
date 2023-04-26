@@ -62,7 +62,7 @@ export async function productById(req: Request, res: Response, next: NextFunctio
 
 export async function deleteProduct(req: Request, res: Response, next: NextFunction) {
   try {
-    const isAssignedToOrder = (await OrderService.getAll()).some(o => o.requestedProducts.some(r => r._id.toString() === req.params.id));
+    const isAssignedToOrder = (await OrderService.getAll()).some(o => o.products.some(r => r._id.toString() === req.params.id));
     if (isAssignedToOrder) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: `Not allowed to delete product, assigned to the order` });
     }
