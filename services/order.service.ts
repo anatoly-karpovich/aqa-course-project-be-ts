@@ -18,6 +18,7 @@ class OrderService {
       total_price: getTotalPrice(products),
       createdOn: getTodaysDate(true),
       history: [],
+      comments: [],
     };
     newOrder.history.unshift(createHistoryEntry(newOrder, action));
     const createdOrder = await Order.create(newOrder);
@@ -59,6 +60,7 @@ class OrderService {
       total_price: getTotalPrice(products),
       history: orderFromDb.history,
       createdOn: orderFromDb.createdOn,
+      comments: orderFromDb.comments,
     };
     if(!_.isEqual(order.products, orderFromDb.products.map(p => p._id.toString()))) {
       const o = _.cloneDeep(newOrder)

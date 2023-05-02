@@ -30,6 +30,11 @@ const delivery = new mongoose.Schema(
   { _id: false }
 );
 
+const comment = new mongoose.Schema({
+  text: { type: String, required: true},
+  createdOn: { type: Date, required: true},
+})
+
 const history = new mongoose.Schema(
   {
     status: { type: String, required: true },
@@ -50,6 +55,7 @@ const Order = new mongoose.Schema({
   delivery: { type: delivery, required: false },
   total_price: { type: Number, require: true },
   createdOn: { type: Date, required: true },
+  comments: [{ type: comment, required: false }],
   history: [{ type: history, required: false }],
   //   createdBy: { type: String, required: true },
 }, { versionKey: false });

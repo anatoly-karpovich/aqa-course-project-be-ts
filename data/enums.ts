@@ -56,7 +56,8 @@ export enum VALIDATION_ERROR_MESSAGES {
   CUSTOMER = "Incorrect Customer",
   PRODUCT = "Incorrect Customer",
   DELIVERY = 'Incorrect Delivery',
-  BODY = "Incorrect request body"
+  BODY = "Incorrect request body",
+  COMMENT_NOT_FOUND = "Comment was not found",
 };
 
 export enum ORDER_HISTORY_ACTIONS {

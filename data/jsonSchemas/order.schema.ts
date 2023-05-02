@@ -80,3 +80,33 @@ export const orderUpdateSchema: AllowedSchema = {
     },
     required: ["_id", "delivery"],
   };
+
+  export const orderCommentsCreateSchema: AllowedSchema = {
+    type: "object",
+    properties: {
+      _id: { type: "string" },
+      comments: {
+        type: "object",
+        properties: {
+          text: { type: "string" },
+        },
+        required: ["text"],
+      },
+    },
+    required: ["_id", "comments"],
+  };
+
+  export const orderCommentsDeleteSchema: AllowedSchema = {
+    type: "object",
+    properties: {
+      _id: { type: "string" },
+      comments: {
+        type: "object",
+        properties: {
+          _id: { type: "string" },
+        },
+        required: ["_id"],
+      },
+    },
+    required: ["_id", "comments"],
+  };

@@ -157,3 +157,37 @@ export async function orderDelivery(req: Request, res: Response, next: NextFunct
   }
   next();
 }
+
+export async function orderCommentsCreate(req: Request, res: Response, next: NextFunction) {
+  try {
+    if (!req.body._id) {
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
+    }
+    if (!req.body.comments || !req.body.comments.text) {
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
+    }
+    next();
+  } catch (e: any) {
+    console.log(e);
+    return res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
+  }
+}
+
+export async function orderCommentsDelete(req: Request, res: Response, next: NextFunction) {
+  try {
+    if (!req.body._id) {
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
+    }
+    if (!req.body.comments || !req.body.comments._id) {
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
+    }
+    const comment = (await OrderService.getOrder(req.body._id)).comments.find((c) => c._id.toString() === req.body.comments._id);
+    if (!comment) {
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.COMMENT_NOT_FOUND });
+    }
+    next();
+  } catch (e: any) {
+    console.log(e);
+    return res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
+  }
+}

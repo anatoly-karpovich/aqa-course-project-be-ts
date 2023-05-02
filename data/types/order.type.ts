@@ -1,6 +1,6 @@
 import { ORDER_HISTORY_ACTIONS, ORDER_STATUSES } from "../enums";
 import * as mongoose from "mongoose";
-import type { ICustomer, IProduct, IDelivery, DocumentResult } from ".";
+import type { ICustomer, IProduct, IDelivery, DocumentResult, IComment } from ".";
 
 export interface IOrder<CustomerType> {
   readonly _id?: mongoose.Types.ObjectId;
@@ -11,6 +11,7 @@ export interface IOrder<CustomerType> {
   total_price: number;
   createdOn: string;
   history: IHistory[];
+  comments: IComment[];
 }
 
 export interface IProductInOrder extends IProduct {
