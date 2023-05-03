@@ -33,7 +33,8 @@ export async function productValidations(req: Request, res: Response, next: Next
     if (!isValidInput("Price", req.body.price) || req.body.price <= 0 || req.body.price > 99999) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
     }
-    if (req.body.notes && (!isValidInput("Notes", req.body.notes) || req.body.notes.trim().length !== req.body.notes.length)) {
+    if (req.body.notes && (!isValidInput("Notes", req.body.notes) || req.body.notes.trim().length !== req.body.notes.length 
+    || (req.body.notes.trim().replaceAll("\r", "").replaceAll("\n","")).length > 250)) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
     }
     if (!Object.values(MANUFACTURERS).includes(req.body.manufacturer)) {

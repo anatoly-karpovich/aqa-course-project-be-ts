@@ -166,6 +166,12 @@ export async function orderCommentsCreate(req: Request, res: Response, next: Nex
     if (!req.body.comments || !req.body.comments.text) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
     }
+    
+    const replacedText = req.body.comments.text.replaceAll("\r", "").replaceAll("\n","")
+
+    if (!req.body.comments.text.length || replacedText.length > 250) {
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
+    }
     next();
   } catch (e: any) {
     console.log(e);

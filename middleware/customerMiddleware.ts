@@ -54,7 +54,8 @@ export async function customerValidations(req: Request, res: Response, next: Nex
     if (!Object.values(COUNTRIES).includes(req.body.country) || (req.body.country && req.body.country.trim().length !== req.body.country.length)) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
     }
-    if (req.body.notes && (!isValidInput("Notes", req.body.notes) || req.body.notes.trim().length !== req.body.notes.length)) {
+    if (req.body.notes && (!isValidInput("Notes", req.body.notes) || req.body.notes.trim().length !== req.body.notes.length 
+    || (req.body.notes.trim().replaceAll("\r", "").replaceAll("\n","")).length > 250)) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
     }
 

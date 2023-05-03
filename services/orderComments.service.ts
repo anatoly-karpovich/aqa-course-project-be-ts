@@ -32,7 +32,6 @@ class OrderCommentsService {
     const updatedOrder = await OrderService.getOrder(order._id);
     const customer = await CustomerService.getCustomer(updatedOrder.customer._id);
     return { ...updatedOrder, customer }
-
   }
 }
 
