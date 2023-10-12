@@ -2,7 +2,7 @@ import { Express } from "express";
 import swaggerjJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import pkg from "../package.json";
-
+import {spec} from "./swagger-spec"
 const { version } = pkg;
 
 const url = ``
@@ -20,20 +20,6 @@ const options = {
         {
           url: `https://aqa-course-project.app/`,
         },
-      ],
-      components: {
-          secutirySchemas: {
-              bearerAuth: {
-                  type: 'http',
-                  scheme: 'bearer',
-                  bearerFormat: 'JWT'
-              }
-          }
-      },
-      security: [
-          {
-              bearerAuth: []
-          }
       ]
     },
     apis: ["./dist/routers/*.router.js"],
@@ -42,7 +28,7 @@ const options = {
 function swaggerDocs(app: Express) {
   const swaggerSpec = swaggerjJsdoc(options);
   //Swagger Page
-  app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(spec));
 
   //Docs in JSON format
   app.get("doc.json", (req, res) => {
