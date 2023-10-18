@@ -75,7 +75,7 @@ export const spec = {
     },
     components: {
         "securitySchemes": {
-          "bearerAuth": {
+          "BearerAuth": {
               "type": "http",
               "scheme": "bearer",
               "bearerFormat": "JWT"
@@ -206,9 +206,9 @@ export const spec = {
             }
         }
     },
-    "security": {
-        "bearerAuth": {
-            "type": "array"
+    "security": [
+        {
+            "BearerAuth": []
         }
-    }
+    ]
 }
