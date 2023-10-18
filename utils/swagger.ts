@@ -2,7 +2,7 @@ import { Express } from "express";
 import swaggerjJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import pkg from "../package.json";
-import {spec} from "./swagger-spec"
+import {spec} from "../swagger_docs/swagger-spec"
 const { version } = pkg;
 
 const url = ``

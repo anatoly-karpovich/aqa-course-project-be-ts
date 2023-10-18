@@ -22,34 +22,20 @@ export const spec = {
                 "tags": ["Products"],
                 "responses": {
                     "200": {
-                        "description": "The list of products",
+                        "description": "OK",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        $ref: "#/components/schemas/Product"
+                                        "$ref": "#/components/schemas/Get products list"
                                     }
                                 }
                             }
                         }
                     },
                     "401": {
-                        description: "Error: Unauthorized",
-                        content: {
-                            'application/json': {
-                                example: {
-                                    "IsSuccess": false,
-                                    "ErrorMessage": "Not authorized"
-                                },
-                                schema: {
-                                    type: 'object',
-                                    items: {
-                                        $ref: '#/components/schemas/Unauthorized'
-                                    }
-                                }
-                            }
-                        }
+                        "$ref": "#/components/responses/error/Unauthorized"
                     }
                 }
             }
@@ -71,100 +57,158 @@ export const spec = {
                 ],
                 "responses": {
                     "200": {
-                        "description": "The product by Id",
+                        "description": "Success",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Product"
+                                    "$ref": "#/components/schemas/Get product"
                                 }
                             }
                         }
                     },
                     "404": {
-                        "description": "The product was not found"
+                        "description": "Not found"
                     }
                 }
             }
         }
     },
     components: {
-        schemas: {
-            "Product": {
+        "securitySchemes": {
+          "bearerAuth": {
+              "type": "http",
+              "scheme": "bearer",
+              "bearerFormat": "JWT"
+          }
+        },
+        "schemas": {
+            "Get products list": {
                 "type": "object",
-                "required": ["name", "amount", "price", "manufacturer"],
+                "required": ["Product", "IsSuccess", "ErrorMessage"],
                 "properties": {
-                    "_id": {
+                    "Products": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": ["name", "amount", "price", "manufacturer", "_id", "createdOn", "notes"],
+                            "properties": {
+                                "_id": {
+                                    "type": "string",
+                                    "description": "The auto-generated id of the product"
+                                },
+                                "name": {
+                                    "type": "string",
+                                    "description": "The product's name"
+                                },
+                                "amount": {
+                                    "type": "number",
+                                    "description": "The product's amount"
+                                },
+                                "price": {
+                                    "type": "number",
+                                    "description": "The product's price"
+                                },
+                                "manufacturer": {
+                                    "type": "string",
+                                    "enum": ["Apple", "Samsung", "Google", "Microsoft", "Sony", "Xiaomi", "Amazon", "Tesla"],
+                                    "description": "The product's manufacturer"
+                                },
+                                "notes": {
+                                    "type": "string",
+                                    "description": "The product's notes"
+                                },
+                                "createdOn": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "description": "The creation date"
+                                },
+                            }
+                        },
+                    },
+                    "IsSuccess": {
+                        "type": "boolean",
+                        "description": "Indicates whether the request was successful."
+                    },
+                    "ErrorMessage": {
                         "type": "string",
-                        "description": "The auto-generated id of the product"
-                    },
-                    "name": {
-                        "type": "string",
-                        "description": "The product's name"
-                    },
-                    "amount": {
-                        "type": "number",
-                        "description": "The product's amount"
-                    },
-                    "price": {
-                        "type": "number",
-                        "description": "The product's price"
-                    },
-                    "manufacturer": {
-                        "type": "string",
-                        "enum": ["Apple", "Samsung", "Google", "Microsoft", "Sony", "Xiaomi", "Amazon", "Tesla"],
-                        "description": "The product's manufacturer"
-                    },
-                    "notes": {
-                        "type": "string",
-                        "description": "The product's notes"
+                        "description": "An error message, if any."
                     }
                 }
             },
-            "ProductWithoutId": {
+            "Get product": {
                 "type": "object",
-                "required": ["name", "amount", "price", "manufacturer"],
+                "required": ["Product", "IsSuccess", "ErrorMessage"],
                 "properties": {
-                    "name": {
+                    "Products": {
+                        "type": "object",
+                        "required": ["name", "amount", "price", "manufacturer", "_id", "createdOn", "notes"],
+                        "properties": {
+                            "_id": {
+                                "type": "string",
+                                "description": "The auto-generated id of the product"
+                            },
+                            "name": {
+                                "type": "string",
+                                "description": "The product's name"
+                            },
+                            "amount": {
+                                "type": "number",
+                                "description": "The product's amount"
+                            },
+                            "price": {
+                                "type": "number",
+                                "description": "The product's price"
+                            },
+                            "manufacturer": {
+                                "type": "string",
+                                "enum": ["Apple", "Samsung", "Google", "Microsoft", "Sony", "Xiaomi", "Amazon", "Tesla"],
+                                "description": "The product's manufacturer"
+                            },
+                            "notes": {
+                                "type": "string",
+                                "description": "The product's notes"
+                            },
+                            "createdOn": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "The creation date"
+                            },
+                        }
+
+                    },
+                    "IsSuccess": {
+                        "type": "boolean",
+                        "description": "Indicates whether the request was successful."
+                    },
+                    "ErrorMessage": {
                         "type": "string",
-                        "description": "The product's name"
-                    },
-                    "amount": {
-                        "type": "number",
-                        "description": "The product's amount"
-                    },
-                    "price": {
-                        "type": "number",
-                        "description": "The product's price"
-                    },
-                    "manufacturer": {
-                        "type": "string",
-                        "enum": ["Apple", "Samsung", "Google", "Microsoft", "Sony", "Xiaomi", "Amazon", "Tesla"],
-                        "description": "The product's manufacturer"
-                    },
-                    "notes": {
-                        "type": "string",
-                        "description": "The product's notes"
-                    }
-                }
-            },
-            "Unauthorized": {
-                "type": 'object',
-                "required": ["IsSuccess", "ErrorMessage"],
-                "properties": {
-                    'IsSuccess': {
-                        "type": 'boolean',
-                        "description": 'Operation successful or not'
-                    },
-                    'ErrorMessage': {
-                        "type": 'string',
-                        "description": 'Error message'
-                    },
-                    "example": {
-                        "IsSuccess": "false",
-                        "ErrorMessage": "Not authorized"
+                        "description": "An error message, if any."
                     }
                 }
             }
+        },
+        "responses": {
+            "success": {},
+            "error": {
+                "Unauthorized": {
+                    "description": "Unauthorized",
+                    "type": "array",
+                    "required": ["IsSuccess", "ErrorMessage"],
+                    "content": {
+                        "application/json": {
+                            "example": {
+                                "IsSuccess": false,
+                                "ErrorMessage": "Unauthorized"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "security": {
+        "bearerAuth": {
+            "type": "array"
         }
     }
 }
