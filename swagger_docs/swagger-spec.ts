@@ -67,19 +67,53 @@ export const spec = {
                         }
                     },
                     "404": {
-                        "description": "Not found"
+                        "$ref": "#/components/responses/error/Not found"
+                    }
+                }
+            }
+        },
+        "/api/products/": {
+            "post": {
+                "summary": "Create product",
+                "tags": ["Products"],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Create product"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Get product"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/error/Bad request"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/error/Unauthorized"
                     }
                 }
             }
         }
     },
-    components: {
+    "components": {
         "securitySchemes": {
-          "BearerAuth": {
-              "type": "http",
-              "scheme": "bearer",
-              "bearerFormat": "JWT"
-          }
+            "BearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
         },
         "schemas": {
             "Get products list": {
@@ -130,7 +164,7 @@ export const spec = {
                         "description": "Indicates whether the request was successful."
                     },
                     "ErrorMessage": {
-                        "type": "string",
+                        "type": null,
                         "description": "An error message, if any."
                     }
                 }
@@ -181,8 +215,35 @@ export const spec = {
                         "description": "Indicates whether the request was successful."
                     },
                     "ErrorMessage": {
-                        "type": "string",
+                        "type": ["string"],
                         "description": "An error message, if any."
+                    }
+                }
+            },
+            "Create product": {
+                "type": "object",
+                "required": ["name", "amount", "price", "manufacturer"],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "The product's name"
+                    },
+                    "amount": {
+                        "type": "number",
+                        "description": "The product's amount"
+                    },
+                    "price": {
+                        "type": "number",
+                        "description": "The product's price"
+                    },
+                    "manufacturer": {
+                        "type": "string",
+                        "enum": ["Apple", "Samsung", "Google", "Microsoft", "Sony", "Xiaomi", "Amazon", "Tesla"],
+                        "description": "The product's manufacturer"
+                    },
+                    "notes": {
+                        "type": "string",
+                        "description": "The product's notes"
                     }
                 }
             }
@@ -192,13 +253,50 @@ export const spec = {
             "error": {
                 "Unauthorized": {
                     "description": "Unauthorized",
-                    "type": "array",
+                    "type": "object",
                     "required": ["IsSuccess", "ErrorMessage"],
                     "content": {
                         "application/json": {
                             "example": {
                                 "IsSuccess": false,
                                 "ErrorMessage": "Unauthorized"
+                            }
+                        }
+                    }
+                },
+                "Bad request": {
+                    "description": "Bad request",
+                    "type": "object",
+                    "required": ["IsSuccess", "ErrorMessage", "SchemaErrors"],
+                    "content": {
+                        "application/json": {
+                            "example": {
+                                "IsSuccess": false,
+                                "ErrorMessage": "Incorrect request body",
+                                "SchemaErrors": [
+                                    {
+                                        "instancePath": "/amount",
+                                        "schemaPath": "#/properties/amount/type",
+                                        "keyword": "type",
+                                        "params": {
+                                            "type": "integer"
+                                        },
+                                        "message": "must be integer"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "Not found": {
+                    "description": "Not found",
+                    "type": "object",
+                    "required": ["IsSuccess", "ErrorMessage", ],
+                    "content": {
+                        "application/json": {
+                            "example": {
+                                "IsSuccess": false,
+                                "ErrorMessage": "Product with id '989268309480fd7d87293h1w' wasn't found"
                             }
                         }
                     }
