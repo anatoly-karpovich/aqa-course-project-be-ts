@@ -5,39 +5,33 @@ import pkg from "../package.json";
 
 const { version } = pkg;
 
-const url = ``
+const url = ``;
 
 const options = {
-  
-    definition: {
-      openapi: "3.0.0",
-      info: {
-        title: "Sales Portal API",
-        version: version,
-        description: "AQA course project API",
-      },
-      servers: [
-        {
-          url: `https://aqa-course-project.app/`,
-        },
-      ],
-      components: {
-          secutirySchemas: {
-              bearerAuth: {
-                  type: 'http',
-                  scheme: 'bearer',
-                  bearerFormat: 'JWT'
-              }
-          }
-      },
-      security: [
-          {
-              bearerAuth: []
-          }
-      ]
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Sales Portal API",
+      version: version,
+      description: "AQA course project API",
     },
-    apis: ["./dist/routers/*.router.js"],
-  };
+    servers: [
+      {
+        url: `https://aqa-course-project.app/`,
+      },
+    ],
+    components: {
+      securitySchemes: {
+        BearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT", // Modify this based on your token format
+        },
+      },
+    },
+  },
+  apis: ["./dist/routers/*.router.js"],
+};
 
 function swaggerDocs(app: Express) {
   const swaggerSpec = swaggerjJsdoc(options);

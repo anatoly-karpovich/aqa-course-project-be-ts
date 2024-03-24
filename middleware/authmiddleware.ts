@@ -7,8 +7,8 @@ export function authmiddleware(req: Request, res: Response, next: NextFunction) 
   }
 
   try {
-    if(!req.headers.authorization) {
-        return res.status(401).json({ IsSuccess: false, ErrorMessage: "Not authorized" });
+    if (!req.headers.authorization) {
+      return res.status(401).json({ IsSuccess: false, ErrorMessage: "Not authorized" });
     }
     const token = req.headers.authorization.split(" ")[1];
     if (!token) {
@@ -21,7 +21,7 @@ export function authmiddleware(req: Request, res: Response, next: NextFunction) 
     console.log(e);
     if (e instanceof TokenExpiredError) {
       return res.status(401).send({
-        isSuccess: false,
+        IsSuccess: false,
         ErrorMessage: "Access token expired",
       });
     }

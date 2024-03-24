@@ -12,7 +12,7 @@ import swaggerDocs from "./utils/swagger.js";
 import orderDeliveryRouter from "./routers/orderDelivery.router";
 import { errorHandleMiddleware } from "./middleware/errorHandleMiddleware";
 import { authmiddleware } from "./middleware/authmiddleware";
-import cors from 'cors'
+import cors from "cors";
 import orderCommentsRouter from "./routers/orderComments.router";
 // import swaggerjJsdoc from 'swagger-jsdoc'
 // import swaggerUi from 'swagger-ui-express'
@@ -31,10 +31,10 @@ const BASE_URL = process.env.ENVIRONMENT;
 
 const cors_options: cors.CorsOptions = {
   // origin: ["http://127.0.0.1:5502", "https://anatoly-karpovich.github.io"],
-    "origin": "*",
-    "methods": "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
-    "preflightContinue": false,
-    "optionsSuccessStatus": 200
+  origin: "*",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+  preflightContinue: false,
+  optionsSuccessStatus: 200,
 };
 
 // app.use(function (req, res, next) {
@@ -55,7 +55,7 @@ const cors_options: cors.CorsOptions = {
 //   // Pass to next layer of middleware
 //   next();
 // });
-app.use(cors(cors_options))
+app.use(cors(cors_options));
 app.options("*", cors());
 app.use(express.json());
 app.use(express.static("static"));
@@ -68,7 +68,7 @@ app.use("/api", orderRouter);
 app.use("/api", orderStatusRouter);
 app.use("/api", orderReceiveRouter);
 app.use("/api", orderDeliveryRouter);
-app.use("/api", orderCommentsRouter)
+app.use("/api", orderCommentsRouter);
 app.use(errorHandleMiddleware);
 
 async function startApp() {

@@ -1,3 +1,6 @@
+## Database
+`Create mongo database on https://www.mongodb.com/`
+
 ## Install
 `npm install`
 
@@ -8,7 +11,7 @@
 4. `DB_PASSWORD` - mongo database password
 5. `SECRET_KEY` - secret key for JWT token
 
-**Variables need to be provided in .env file or before server running script**
+**Variables need to be provided in .env file in the root folder**
 
 ## Run server
 

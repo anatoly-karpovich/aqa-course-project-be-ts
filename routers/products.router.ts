@@ -44,7 +44,7 @@ const productsRouter = Router();
  *         "price": 1
  *         "manufacturer": "Apple"
  *         "notes": "note 1"
- * 
+ *
  *     Product without id:
  *       type: object
  *       required:
@@ -91,7 +91,7 @@ const productsRouter = Router();
  *     summary: Get the list of products
  *     tags: [Products]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: The list of the products
