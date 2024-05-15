@@ -14,6 +14,7 @@ import { errorHandleMiddleware } from "./middleware/errorHandleMiddleware";
 import { authmiddleware } from "./middleware/authmiddleware";
 import cors from "cors";
 import orderCommentsRouter from "./routers/orderComments.router";
+import rebatesRouter from "./routers/rebates.router";
 // import swaggerjJsdoc from 'swagger-jsdoc'
 // import swaggerUi from 'swagger-ui-express'
 // import  pkg  from './package.json' assert { type: "json" }
@@ -60,6 +61,7 @@ app.options("*", cors());
 app.use(express.json());
 app.use(express.static("static"));
 app.use(fileUpload({}));
+app.use("/api", rebatesRouter);
 app.use("/api", authRouter);
 // app.use(authmiddleware);
 app.use("/api", productsRouter);
