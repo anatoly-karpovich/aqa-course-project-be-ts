@@ -9,7 +9,7 @@ class PromocodesController {
       ["15-PERCENT-FOR-CSS"]: 15, //+
       ["HelloThere"]: 20, //+ HASH SHA 1: 9c4218e5d95c7b3dafe8d0053b0a4e8671eb9b62
       ["5-PERCENT-FOR-UTILS"]: 5, //+
-      ["10-PERCENT-FOR-REDEEM"]: 10,
+      ["10-PERCENT-FOR-REDEEM"]: 10, //+
     };
     try {
       const codeNameFromRequest = req.params.id;

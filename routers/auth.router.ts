@@ -13,6 +13,7 @@ authRouter.post(
   AuthController.registration
 );
 authRouter.post("/login", AuthController.login);
+authRouter.post("/initiate", AuthController.initiate);
 // authRouter.get('/users', authmiddleware, AuthController.getUsers) FOR CHECHING AUTHORIZATION
 // authRouter.get('/users', roleMiddleware(ROLES.ADMIN), AuthController.getUsers)
 

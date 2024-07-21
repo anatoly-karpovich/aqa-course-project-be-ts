@@ -22,7 +22,7 @@ import rebatesRouter from "./routers/rebates.router";
 // const { version } = pkg
 dotenv.config();
 
-const DB_URL = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.j9uiirp.mongodb.net/?retryWrites=true&w=majority`;
+const DB_URL = `mongodb+srv://test:test@cluster0.uhetxuv.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 const PORT = +process.env.PORT;
 

@@ -18,6 +18,7 @@ class AuthController {
   async registration(req: Request, res: Response) {
     try {
       const errors = validationResult(req);
+      console.log(errors);
       if (!errors.isEmpty()) {
         //TODO: investigate how to fix below code
         //@ts-ignore
@@ -32,7 +33,7 @@ class AuthController {
       const userRole = await Role.findOne({ value: req.body.roles[0] });
       const user = new User({ username, password: hashPassword, roles: [userRole.value] });
       await user.save();
-      return res.status(201).json({IsSuccess: true, ErrorMessage: null});
+      return res.status(201).json({ IsSuccess: true, ErrorMessage: null });
     } catch (e) {
       console.log(e);
       res.status(400).json({ IsSuccess: false, ErrorMessage: "Registration error" });
@@ -65,6 +66,20 @@ class AuthController {
     } catch (e) {
       console.log(e);
       res.status(400).json({ IsSuccess: false, ErrorMessage: e });
+    }
+  }
+
+  async initiate(req: Request, res: Response) {
+    try {
+      const roles = await Role.find({ value: "ADMIN" });
+      if (roles.length) {
+        return res.status(400).json({ IsSuccess: true, ErrorMessage: "Backend is already initiated" });
+      }
+      const adminRole = new Role({ value: "ADMIN" });
+      await adminRole.save();
+      res.json("Admin role successfully created");
+    } catch (error) {
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: (error as Error).message });
     }
   }
 }
