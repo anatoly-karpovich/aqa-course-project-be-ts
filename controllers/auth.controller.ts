@@ -32,7 +32,7 @@ class AuthController {
       const userRole = await Role.findOne({ value: req.body.roles[0] });
       const user = new User({ username, password: hashPassword, roles: [userRole.value] });
       await user.save();
-      return res.status(201).json({IsSuccess: true, ErrorMessage: null});
+      return res.status(201).json({ IsSuccess: true, ErrorMessage: null });
     } catch (e) {
       console.log(e);
       res.status(400).json({ IsSuccess: false, ErrorMessage: "Registration error" });
@@ -51,7 +51,7 @@ class AuthController {
         return res.status(400).json({ IsSuccess: false, ErrorMessage: `Incorrect credentials` });
       }
       const token = generateAccessToken(user._id, user.roles);
-      return res.json({ token });
+      return res.json({ token, IsSuccess: true, ErrorMessage: null });
     } catch (e) {
       console.log(e);
       res.status(400).json({ IsSuccess: false, ErrorMessage: "Login error" });
