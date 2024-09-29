@@ -45,7 +45,7 @@ const productsRouter = Router();
  *         "manufacturer": "Apple"
  *         "notes": "note 1"
  *
- *     Product without id:
+ *     ProductWithoutId:
  *       type: object
  *       required:
  *         - name
@@ -90,6 +90,14 @@ const productsRouter = Router();
  *   get:
  *     summary: Get the list of products
  *     tags: [Products]
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: Bearer <JWT token>
+ *         description: Bearer token for authentication
  *     security:
  *       - BearerAuth: []
  *     responses:
@@ -101,6 +109,10 @@ const productsRouter = Router();
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Product'
+ *       401:
+ *         description: Unauthorized, missing or invalid token
+ *       500:
+ *         description: Server error
  */
 
 productsRouter.get("/products", authmiddleware, ProductsController.getAll);
@@ -118,6 +130,15 @@ productsRouter.get("/products", authmiddleware, ProductsController.getAll);
  *           type: string
  *         required: true
  *         description: The product id
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: Bearer <JWT token>
+ *         description: Bearer token for authentication
+ *     security:
+ *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: The product by Id
@@ -125,8 +146,12 @@ productsRouter.get("/products", authmiddleware, ProductsController.getAll);
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Product'
+ *       401:
+ *         description: Unauthorized, missing or invalid token
  *       404:
  *         description: The product was not found
+ *       500:
+ *         description: Server error
  */
 
 productsRouter.get("/products/:id", authmiddleware, productById, ProductsController.getProduct);
@@ -137,61 +162,53 @@ productsRouter.get("/products/:id", authmiddleware, productById, ProductsControl
  *   post:
  *     summary: Create a new product
  *     tags: [Products]
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: Bearer <JWT token>
+ *         description: Bearer token for authentication
+ *     security:
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Product without id'
+ *             $ref: '#/components/schemas/ProductWithoutId'
  *     responses:
- *       200:
- *         description: The product was seccessfully created
+ *       201:
+ *         description: The product was successfully created
  *         content:
  *           application/json:
  *             schema:
- *             $ref: '#/components/schemas/Product'
+ *               $ref: '#/components/schemas/Product'
  *       400:
  *         description: Validation error
- *       500:
- *         description: Server error
- */
-
-productsRouter.post("/products", authmiddleware, schemaMiddleware("productSchema"), uniqueProduct, productValidations, ProductsController.create);
-
-/**
- * @swagger
- * /api/products:
- *   put:
- *     summary: Update the product by id
- *     tags: [Products]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Product'
- *     responses:
- *       200:
- *         description: The product was seccessfully updated
- *         content:
- *           application/json:
- *             schema:
- *             $ref: '#/components/schemas/Product'
- *       400:
- *         description: Validation error
+ *       401:
+ *         description: Unauthorized, missing or invalid token
  *       409:
- *         description: Conflict error
+ *         description: Conflict, product already exists
  *       500:
  *         description: Server error
  */
 
-productsRouter.put("/products", authmiddleware, schemaMiddleware("productSchema"), uniqueProduct, productById, productValidations, ProductsController.update);
+productsRouter.post(
+  "/products",
+  authmiddleware,
+  schemaMiddleware("productSchema"),
+  uniqueProduct,
+  productValidations,
+  ProductsController.create
+);
 
 /**
  * @swagger
  * /api/products/{id}:
- *   delete:
- *     summary: Delete the product by id
+ *   put:
+ *     summary: Update the product by Id
  *     tags: [Products]
  *     parameters:
  *       - in: path
@@ -200,13 +217,83 @@ productsRouter.put("/products", authmiddleware, schemaMiddleware("productSchema"
  *           type: string
  *         required: true
  *         description: The product id
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: Bearer <JWT token>
+ *         description: Bearer token for authentication
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Product'
  *     responses:
- *       204:
- *         description: The product successfully deleted
+ *       200:
+ *         description: The product was successfully updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Product'
+ *       400:
+ *         description: Validation error
+ *       401:
+ *         description: Unauthorized, missing or invalid token
  *       404:
  *         description: The product was not found
  *       409:
- *         description: Conflict error
+ *         description: Conflict, unable to update the product
+ *       500:
+ *         description: Server error
+ */
+
+productsRouter.put(
+  "/products",
+  authmiddleware,
+  schemaMiddleware("productSchema"),
+  uniqueProduct,
+  productById,
+  productValidations,
+  ProductsController.update
+);
+
+/**
+ * @swagger
+ * /api/products/{id}:
+ *   delete:
+ *     summary: Delete the product by Id
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The product id
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: Bearer <JWT token>
+ *         description: Bearer token for authentication
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       204:
+ *         description: The product was successfully deleted
+ *       401:
+ *         description: Unauthorized, missing or invalid token
+ *       404:
+ *         description: The product was not found
+ *       409:
+ *         description: Conflict, unable to delete the product
+ *       500:
+ *         description: Server error
  */
 
 productsRouter.delete("/products/:id", authmiddleware, productById, deleteProduct, ProductsController.delete);
