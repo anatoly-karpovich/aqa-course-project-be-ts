@@ -13,13 +13,13 @@ export const getTotalPrice = (products: IProduct[]) => {
 };
 
 export const getTodaysDate = (withTime: boolean) => {
-  return withTime 
-  ? moment(Date.now()).format(DATE_AND_TIME_FORMAT)
-  : moment(Date.now()).format(DATE_FORMAT)
+  return withTime ? moment(Date.now()).format(DATE_AND_TIME_FORMAT) : moment(Date.now()).format(DATE_FORMAT);
 };
 
-
-export function createHistoryEntry<T extends Omit<IHistory, "changedOn" | "action">>(order: T, action: ORDER_HISTORY_ACTIONS): IHistory {
+export function createHistoryEntry<T extends Omit<IHistory, "changedOn" | "action">>(
+  order: T,
+  action: ORDER_HISTORY_ACTIONS
+): IHistory {
   return {
     action,
     status: order.status,
@@ -38,4 +38,12 @@ export async function productsMapping<T extends Pick<IOrderRequest, "products">>
     })
   );
   return products;
+}
+
+export function createReponse(IsSuccess: boolean, ErrorMessage: string | null, body?: object) {
+  return {
+    ...body,
+    IsSuccess,
+    ErrorMessage,
+  };
 }

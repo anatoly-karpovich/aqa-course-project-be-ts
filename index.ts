@@ -15,6 +15,7 @@ import { authmiddleware } from "./middleware/authmiddleware";
 import cors from "cors";
 import orderCommentsRouter from "./routers/orderComments.router";
 import rebatesRouter from "./routers/rebates.router";
+import checkoutProductsRouter from "./routers/checkout/checkout-products.router";
 // import swaggerjJsdoc from 'swagger-jsdoc'
 // import swaggerUi from 'swagger-ui-express'
 // import  pkg  from './package.json' assert { type: "json" }
@@ -71,6 +72,7 @@ app.use("/api", orderStatusRouter);
 app.use("/api", orderReceiveRouter);
 app.use("/api", orderDeliveryRouter);
 app.use("/api", orderCommentsRouter);
+app.use("/api/checkout", checkoutProductsRouter);
 app.use(errorHandleMiddleware);
 
 async function startApp() {
