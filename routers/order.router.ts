@@ -26,8 +26,33 @@ const orderRouter = Router();
  *           enum: [Draft, In Process, Partially Received, Received, Canceled]
  *           description: The current status of the order
  *         customer:
- *           type: string
- *           description: The customer associated with the order
+ *           type: object
+ *           properties:
+ *             _id:
+ *               type: string
+ *             email:
+ *               type: string
+ *             name:
+ *               type: string
+ *             country:
+ *               type: string
+ *               enum: [USA, Canada, Belarus, Ukraine, Germany, France, Great Britain, Russia]
+ *             city:
+ *               type: string
+ *             street:
+ *               type: string
+ *             house:
+ *               type: number
+ *             flat:
+ *               type: number
+ *             phone:
+ *               type: string
+ *             createdOn:
+ *               type: string
+ *               format: date-time
+ *             notes:
+ *               type: string
+ *           description: Customer details for the order
  *         products:
  *           type: array
  *           items:
@@ -42,6 +67,7 @@ const orderRouter = Router();
  *           description: Date the order was created
  *         delivery:
  *           $ref: '#/components/schemas/Delivery'
+ *           description: Delivery details of the order
  *         comments:
  *           type: array
  *           items:
@@ -54,30 +80,157 @@ const orderRouter = Router();
  *           description: History of the order
  *       example:
  *         _id: "648870eb40c84614b7a8cd11"
- *         status: "Draft"
- *         customer: "648870eb40c84614b7a8cd12"
+ *         status: "In Process"
+ *         customer:
+ *           _id: "66f9d2695ea81af0e61adb59"
+ *           email: "abcd@example.com"
+ *           name: "Ira Swaniawski IV"
+ *           country: "Great Britain"
+ *           city: "Fort Jimmyton"
+ *           street: "Howell Crest"
+ *           house: 169
+ *           flat: 6734
+ *           phone: "+449807453699"
+ *           createdOn: "2024-09-29T22:19:00.000Z"
+ *           notes: "Notes here"
  *         products:
  *           - _id: "648870eb40c84614b7a8cd13"
  *             name: "Product 1"
  *             amount: 2
  *             price: 100
  *             manufacturer: "Apple"
- *             notes: "Some notes"
+ *             notes: "Test notes"
  *             received: false
  *         total_price: 200
  *         createdOn: "2023-09-29T12:00:00Z"
+ *         delivery:
+ *           finalDate: "2023-10-05T12:00:00Z"
+ *           condition: "Delivery"
+ *           address:
+ *             country: "USA"
+ *             city: "New York"
+ *             street: "5th Avenue"
+ *             house: 1
+ *             flat: 101
  *         comments:
  *           - text: "Order placed"
  *             createdOn: "2023-09-29T12:05:00Z"
  *         history:
  *           - status: "Draft"
- *             customer: "648870eb40c84614b7a8cd12"
+ *             customer: "66f9d2695ea81af0e61adb59"
  *             products:
  *               - _id: "648870eb40c84614b7a8cd13"
  *                 name: "Product 1"
  *             total_price: 200
  *             action: "Order created"
  *             changedOn: "2023-09-29T12:00:00Z"
+ *
+ *     OrderWithoutDelivery:
+ *       type: object
+ *       required:
+ *         - status
+ *         - customer
+ *         - products
+ *         - total_price
+ *         - createdOn
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: The auto-generated id of the order
+ *         status:
+ *           type: string
+ *           enum: [Draft, In Process, Partially Received, Received, Canceled]
+ *           description: The current status of the order
+ *         customer:
+ *           type: object
+ *           properties:
+ *             _id:
+ *               type: string
+ *             email:
+ *               type: string
+ *             name:
+ *               type: string
+ *             country:
+ *               type: string
+ *               enum: [USA, Canada, Belarus, Ukraine, Germany, France, Great Britain, Russia]
+ *             city:
+ *               type: string
+ *             street:
+ *               type: string
+ *             house:
+ *               type: number
+ *             flat:
+ *               type: number
+ *             phone:
+ *               type: string
+ *             createdOn:
+ *               type: string
+ *               format: date-time
+ *             notes:
+ *               type: string
+ *         products:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/ProductInOrder'
+ *         total_price:
+ *           type: number
+ *         createdOn:
+ *           type: string
+ *           format: date-time
+ *         delivery:
+ *           type: object
+ *           nullable: true
+ *           description: Delivery details, will be null for Draft status
+ *           example: null
+ *         comments:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/Comment'
+ *         history:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/OrderHistory'
+ *       example:
+ *         status: "Draft"
+ *         customer:
+ *           _id: "66f9d2695ea81af0e61adb59"
+ *           email: "Estefania_Emard@gmail.com"
+ *           name: "Ira Swaniawski IV"
+ *           country: "Great Britain"
+ *           city: "Fort Jimmyton"
+ *           street: "Howell Crest"
+ *           house: 169
+ *           flat: 6734
+ *           phone: "+449807453699"
+ *           createdOn: "2024-09-29T22:19:00.000Z"
+ *           notes: "Notes here"
+ *         products:
+ *           - _id: "66eb4139fd0a2ec681e705aa"
+ *             name: "Gloves48933"
+ *             amount: 2
+ *             price: 100
+ *             manufacturer: "Microsoft"
+ *             notes: "Test notes"
+ *             received: false
+ *         total_price: 300
+ *         createdOn: "2024-09-30T19:42:00.000Z"
+ *         delivery: null
+ *         comments: []
+ *         history:
+ *           - status: "Draft"
+ *             customer: "66f9d2695ea81af0e61adb59"
+ *             products:
+ *               - _id: "66eb4139fd0a2ec681e705aa"
+ *                 name: "Gloves48933"
+ *               - _id: "66ef1332fd0a2ec681e725ad"
+ *                 name: "Bike41263"
+ *               - _id: "66ef12f5fd0a2ec681e725a1"
+ *                 name: "Gloves57362"
+ *             total_price: 300
+ *             delivery: null
+ *             changedOn: "2024-09-30T19:42:00.000Z"
+ *             action: "Order created"
+ *         _id: "66faff1a5ea81af0e61addfa"
  *
  *     ProductInOrder:
  *       type: object
@@ -150,6 +303,28 @@ const orderRouter = Router();
  *           type: string
  *           format: date-time
  *
+ *     CreateOrderPayload:
+ *       type: object
+ *       required:
+ *         - customer
+ *         - products
+ *       properties:
+ *         customer:
+ *           type: string
+ *           description: The ID of the customer placing the order
+ *           example: "64496fed9032279ec58cd8cd"
+ *         products:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: Array of product IDs in the order
+ *           example:
+ *             - "6449700d9032279ec58cd8de"
+ *             - "6449700d9032279ec58cd8de"
+ *             - "6449700d9032279ec58cd8de"
+ *             - "6449700d9032279ec58cd8de"
+ *             - "6449700d9032279ec58cd8de"
+ *
  * tags:
  *   name: Orders
  *   description: Orders management service
@@ -168,19 +343,22 @@ const orderRouter = Router();
  *         schema:
  *           type: string
  *           example: Bearer <JWT token>
+ *         description: Bearer token for authentication
+ *     security:
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Order'
+ *             $ref: '#/components/schemas/CreateOrderPayload'
  *     responses:
  *       201:
  *         description: The order was successfully created
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Order'
+ *               $ref: '#/components/schemas/OrderWithoutDelivery'
  *       400:
  *         description: Validation error
  *       401:
@@ -188,6 +366,7 @@ const orderRouter = Router();
  *       500:
  *         description: Server error
  */
+
 orderRouter.post(
   "/orders",
   authmiddleware,
@@ -195,6 +374,7 @@ orderRouter.post(
   orderValidations,
   OrderController.create
 );
+
 /**
  * @swagger
  * /api/orders:
@@ -208,6 +388,9 @@ orderRouter.post(
  *         schema:
  *           type: string
  *           example: Bearer <JWT token>
+ *         description: Bearer token for authentication
+ *     security:
+ *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: The list of orders
@@ -243,6 +426,9 @@ orderRouter.get("/orders", authmiddleware, OrderController.getAll);
  *         schema:
  *           type: string
  *           example: Bearer <JWT token>
+ *         description: Bearer token for authentication
+ *     security:
+ *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: The order by Id
@@ -272,12 +458,15 @@ orderRouter.get("/orders/:id", authmiddleware, orderById, OrderController.getOrd
  *         schema:
  *           type: string
  *           example: Bearer <JWT token>
+ *         description: Bearer token for authentication
+ *     security:
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Order'
+ *             $ref: '#/components/schemas/CreateOrderPayload'
  *     responses:
  *       200:
  *         description: The order was successfully updated
@@ -296,6 +485,7 @@ orderRouter.get("/orders/:id", authmiddleware, orderById, OrderController.getOrd
  *       500:
  *         description: Server error
  */
+
 orderRouter.put(
   "/orders",
   authmiddleware,
@@ -324,6 +514,9 @@ orderRouter.put(
  *         schema:
  *           type: string
  *           example: Bearer <JWT token>
+ *         description: Bearer token for authentication
+ *     security:
+ *       - BearerAuth: []
  *     responses:
  *       204:
  *         description: The order was successfully deleted

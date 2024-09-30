@@ -44,6 +44,9 @@ const orderReceiveRouter = Router();
  *         schema:
  *           type: string
  *           example: Bearer <JWT token>
+ *         description: Bearer token for authentication
+ *     security:
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -56,7 +59,7 @@ const orderReceiveRouter = Router();
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/OrderReceive'
+ *               $ref: '#/components/schemas/Order'
  *       400:
  *         description: Validation error
  *       401:
