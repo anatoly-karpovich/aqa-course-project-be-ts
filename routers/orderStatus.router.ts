@@ -13,21 +13,16 @@ const orderStatusRouter = Router();
  *     OrderStatusUpdate:
  *       type: object
  *       required:
- *         - _id
  *         - status
  *       properties:
- *         _id:
- *           type: string
- *           description: The order ID
  *         status:
  *           type: string
  *           enum: [Draft, In Process, Partially Received, Received, Canceled]
  *           description: The new status of the order
  *       example:
- *         _id: "648870eb40c84614b7a8cd11"
  *         status: "In Process"
  *
- * /api/orders/status:
+ * /api/orders/{id}/status:
  *   put:
  *     summary: Update the status of an order
  *     tags: [Orders]
@@ -39,6 +34,12 @@ const orderStatusRouter = Router();
  *           type: string
  *           example: Bearer <JWT token>
  *         description: Bearer token for authentication
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the order
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -46,7 +47,16 @@ const orderStatusRouter = Router();
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/OrderStatusUpdate'
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [Draft, In Process, Partially Received, Received, Canceled]
+ *                 description: The new status of the order
+ *             required:
+ *               - status
+ *           example:
+ *             status: "In Process"
  *     responses:
  *       200:
  *         description: The order status was successfully updated
@@ -64,7 +74,7 @@ const orderStatusRouter = Router();
  *         description: Server error
  */
 orderStatusRouter.put(
-  "/orders/status",
+  "/orders/:id/status",
   authmiddleware,
   schemaMiddleware("orderStatusSchema"),
   orderById,

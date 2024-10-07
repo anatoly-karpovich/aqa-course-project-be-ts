@@ -1,25 +1,27 @@
 import Order from "../models/order.model";
 import CustomerService from "./customer.service";
 import _ from "lodash";
-import type { IOrder, ICustomer } from "../data/types";
+import type { IOrder, ICustomer, IDelivery } from "../data/types";
 import OrderService from "./order.service";
 import { createHistoryEntry } from "../utils/utils";
 import { Types } from "mongoose";
 import { ORDER_HISTORY_ACTIONS } from "../data/enums";
 
 class OrderDeliveryService {
-  async updateDelivery(order: Pick<IOrder<Types.ObjectId>, "_id" | "delivery">): Promise<IOrder<ICustomer>> {
-    if (!order._id) {
+  async updateDelivery(orderId: Types.ObjectId, delivery: IDelivery): Promise<IOrder<ICustomer>> {
+    if (!orderId) {
       throw new Error("Id was not provided");
     }
-    
-    const orderFromDB = await OrderService.getOrder(order._id);
 
-    let action = orderFromDB.delivery ? ORDER_HISTORY_ACTIONS.DELIVERY_EDITED : ORDER_HISTORY_ACTIONS.DELIVERY_SCHEDULED
+    const orderFromDB = await OrderService.getOrder(orderId);
+
+    let action = orderFromDB.delivery
+      ? ORDER_HISTORY_ACTIONS.DELIVERY_EDITED
+      : ORDER_HISTORY_ACTIONS.DELIVERY_SCHEDULED;
     const newOrder: IOrder<string> = {
       ...orderFromDB,
       customer: orderFromDB.customer._id.toString(),
-      delivery: order.delivery,
+      delivery: delivery,
     };
     newOrder.history.unshift(createHistoryEntry(newOrder, action));
     const updatedOrder = await Order.findByIdAndUpdate(newOrder._id, newOrder, { new: true });

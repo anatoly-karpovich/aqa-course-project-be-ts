@@ -46,7 +46,8 @@ class OrderController {
 
   async update(req: Request, res: Response) {
     try {
-      const updatedOrder = await OrderService.update(req.body);
+      const orderId = new mongoose.Types.ObjectId(req.params.id);
+      const updatedOrder = await OrderService.update(orderId, req.body);
       return res.status(200).json({ Order: updatedOrder, IsSuccess: true, ErrorMessage: null });
     } catch (e: any) {
       console.log(e);

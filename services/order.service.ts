@@ -98,9 +98,9 @@ class OrderService {
     return { ...orderFromDB._doc, customer };
   }
 
-  async update(order: IOrderRequest): Promise<IOrder<ICustomer>> {
+  async update(orderId: Types.ObjectId, order: IOrderRequest): Promise<IOrder<ICustomer>> {
     const products = await productsMapping(order);
-    const orderFromDb = await this.getOrder(order._id);
+    const orderFromDb = await this.getOrder(orderId);
     const newOrder: IOrder<string> = {
       status: ORDER_STATUSES.DRAFT,
       customer: order.customer.toString(),
@@ -126,7 +126,7 @@ class OrderService {
       o.products = [...orderFromDb.products];
       newOrder.history.unshift(createHistoryEntry(o, ORDER_HISTORY_ACTIONS.CUSTOMER_CHANGED));
     }
-    const updatedOrder = await Order.findByIdAndUpdate(order._id, newOrder, { new: true });
+    const updatedOrder = await Order.findByIdAndUpdate(orderId, newOrder, { new: true });
     const customer = await CustomerService.getCustomer(updatedOrder.customer);
     return { ...updatedOrder._doc, customer };
   }

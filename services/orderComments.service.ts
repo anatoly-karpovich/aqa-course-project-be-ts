@@ -7,19 +7,19 @@ import { getTodaysDate } from "../utils/utils";
 import { Types } from "mongoose";
 
 class OrderCommentsService {
-  async createComment(order: { _id: Types.ObjectId, comments: Pick<IComment, "text"> }): Promise<IOrder<ICustomer>> {
-    if (!order._id) {
+  async createComment(orderId: Types.ObjectId, commentText: string): Promise<IOrder<ICustomer>> {
+    if (!orderId) {
       throw new Error("Id was not provided");
     }
-    const comment: IComment = { 
-      text: order.comments.text,
-      createdOn: getTodaysDate(true) 
-    }
-    const orderFromDB = await OrderService.getOrder(order._id);
+    const comment: IComment = {
+      text: commentText,
+      createdOn: getTodaysDate(true),
+    };
+    const orderFromDB = await OrderService.getOrder(orderId);
     const newOrder: IOrder<string> = {
       ...orderFromDB,
       customer: orderFromDB.customer._id.toString(),
-      comments: [...orderFromDB.comments, comment]
+      comments: [...orderFromDB.comments, comment],
     };
 
     const updatedOrder = await Order.findByIdAndUpdate(newOrder._id, newOrder, { new: true });
@@ -27,11 +27,12 @@ class OrderCommentsService {
     return { ...updatedOrder._doc, customer };
   }
 
-  async deleteComment(order: { _id: Types.ObjectId, comments: Pick<IComment, "_id"> }) {
-    await Order.updateOne({_id: order._id}, { $pull: {comments: {_id: order.comments._id}}})
-    const updatedOrder = await OrderService.getOrder(order._id);
+  // async deleteComment(order: { _id: Types.ObjectId; comments: Pick<IComment, "_id"> }) {
+  async deleteComment(orderId: Types.ObjectId, commentId: Types.ObjectId) {
+    await Order.updateOne({ _id: orderId }, { $pull: { comments: { _id: commentId } } });
+    const updatedOrder = await OrderService.getOrder(orderId);
     const customer = await CustomerService.getCustomer(updatedOrder.customer._id);
-    return { ...updatedOrder, customer }
+    return { ...updatedOrder, customer };
   }
 }
 

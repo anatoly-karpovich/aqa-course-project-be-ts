@@ -8,53 +8,7 @@ const orderCommentsRouter = Router();
 
 /**
  * @swagger
- * components:
- *   schemas:
- *     OrderCommentCreate:
- *       type: object
- *       required:
- *         - _id
- *         - comments
- *       properties:
- *         _id:
- *           type: string
- *           description: The order ID
- *         comments:
- *           type: object
- *           required:
- *             - text
- *           properties:
- *             text:
- *               type: string
- *               description: Comment text
- *       example:
- *         _id: "644e9c138ec7cfb87585643d"
- *         comments:
- *           text: "Great service!"
- *
- *     OrderCommentDelete:
- *       type: object
- *       required:
- *         - _id
- *         - comments
- *       properties:
- *         _id:
- *           type: string
- *           description: The order ID
- *         comments:
- *           type: object
- *           required:
- *             - _id
- *           properties:
- *             _id:
- *               type: string
- *               description: The comment ID
- *       example:
- *         _id: "644e9c138ec7cfb87585643d"
- *         comments:
- *           _id: "645189c01b1eccc04f9aba5d"
- *
- * /api/orders/comments:
+ * /api/orders/{id}/comments:
  *   post:
  *     summary: Add a comment to an order
  *     tags: [Orders]
@@ -66,6 +20,12 @@ const orderCommentsRouter = Router();
  *           type: string
  *           example: Bearer <JWT token>
  *         description: Bearer token for authentication
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the order
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -73,7 +33,15 @@ const orderCommentsRouter = Router();
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/OrderCommentCreate'
+ *             type: object
+ *             properties:
+ *               comment:
+ *                 type: string
+ *                 description: Comment text
+ *             required:
+ *               - comment
+ *           example:
+ *             comment: "Great service!"
  *     responses:
  *       200:
  *         description: Comment successfully added to the order
@@ -89,8 +57,21 @@ const orderCommentsRouter = Router();
  *         description: Order not found
  *       500:
  *         description: Server error
- *
- *   put:
+ */
+
+orderCommentsRouter.post(
+  "/orders/:id/comments",
+  authmiddleware,
+  schemaMiddleware("orderCommentsCreateSchema"),
+  orderCommentsCreate,
+  orderById,
+  OrderCommentsController.create
+);
+
+/**
+ * @swagger
+ * /api/orders/{id}/comments/{commentId}:
+ *   delete:
  *     summary: Delete a comment from an order
  *     tags: [Orders]
  *     parameters:
@@ -101,21 +82,23 @@ const orderCommentsRouter = Router();
  *           type: string
  *           example: Bearer <JWT token>
  *         description: Bearer token for authentication
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the order
+ *       - in: path
+ *         name: commentId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the comment to delete
  *     security:
  *       - BearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/OrderCommentDelete'
  *     responses:
- *       200:
- *         description: Comment successfully deleted from the order
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Order'
+ *       204:
+ *         description: Comment successfully deleted, no content
  *       400:
  *         description: Validation error
  *       401:
@@ -126,18 +109,9 @@ const orderCommentsRouter = Router();
  *         description: Server error
  */
 
-orderCommentsRouter.post(
-  "/orders/comments",
+orderCommentsRouter.delete(
+  "/orders/:id/comments/:commentId",
   authmiddleware,
-  schemaMiddleware("orderCommentsCreateSchema"),
-  orderCommentsCreate,
-  orderById,
-  OrderCommentsController.create
-);
-orderCommentsRouter.put(
-  "/orders/comments",
-  authmiddleware,
-  schemaMiddleware("orderCommentsDeleteSchema"),
   orderById,
   orderCommentsDelete,
   OrderCommentsController.delete

@@ -4,10 +4,11 @@ import ProductsService from "../services/products.service.js";
 import { Request, Response, NextFunction } from "express";
 import { ORDER_STATUSES, VALIDATION_ERROR_MESSAGES } from "../data/enums";
 import { isValidDate, isValidInput } from "../utils/validations.js";
+import mongoose, { Types } from "mongoose";
 
 export async function orderById(req: Request, res: Response, next: NextFunction) {
   try {
-    const id = req.body._id || req.params.id;
+    const id = new mongoose.Types.ObjectId(req.params.id);
     const order = await OrderService.getOrder(id);
     if (!order) {
       return res.status(404).json({ IsSuccess: false, ErrorMessage: `Order with id '${id}' wasn't found` });
@@ -31,7 +32,9 @@ export async function orderValidations(req: Request, res: Response, next: NextFu
   try {
     const customer = await CustomerService.getCustomer(req.body.customer);
     if (!customer) {
-      return res.status(404).json({ IsSuccess: false, ErrorMessage: `Customer with id '${req.body.customer}' wasn't found` });
+      return res
+        .status(404)
+        .json({ IsSuccess: false, ErrorMessage: `Customer with id '${req.body.customer}' wasn't found` });
     }
 
     for (const p of req.body.products) {
@@ -80,9 +83,9 @@ export async function orderStatus(req: Request, res: Response, next: NextFunctio
 
 export async function orderUpdateValidations(req: Request, res: Response, next: NextFunction) {
   try {
-    const id = req.body._id;
-    let order = await OrderService.getOrder(req.body._id);
-    if (!order) return res.status(404).json({ IsSuccess: false, ErrorMessage: `Order with id '${req.body._id}' wasn't found` });
+    const id = new mongoose.Types.ObjectId(req.params.id);
+    let order = await OrderService.getOrder(id);
+    if (!order) return res.status(404).json({ IsSuccess: false, ErrorMessage: `Order with id '${id}' wasn't found` });
     if (order.status !== "Draft") {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: `Invalid order status` });
     }
@@ -95,7 +98,8 @@ export async function orderUpdateValidations(req: Request, res: Response, next: 
 
 export async function orderReceiveValidations(req: Request, res: Response, next: NextFunction) {
   try {
-    const order = await OrderService.getOrder(req.body._id);
+    const id = new mongoose.Types.ObjectId(req.params.id);
+    const order = await OrderService.getOrder(id);
     if (!order) {
       return res.status(404).json({ IsSuccess: false, ErrorMessage: `Order with id '${req.body._id}' wasn't found` });
     }
@@ -114,7 +118,9 @@ export async function orderReceiveValidations(req: Request, res: Response, next:
 
     for (const product of req.body.products) {
       if (!order.products.find((el) => el._id.toString() === product)) {
-        return res.status(400).json({ IsSuccess: false, ErrorMessage: `Product with Id '${product}' is not requested` });
+        return res
+          .status(400)
+          .json({ IsSuccess: false, ErrorMessage: `Product with Id '${product}' is not requested` });
       }
     }
     next();
@@ -126,30 +132,36 @@ export async function orderReceiveValidations(req: Request, res: Response, next:
 
 export async function orderDelivery(req: Request, res: Response, next: NextFunction) {
   try {
-    const id = req.body._id || req.params.id;
+    const id = new mongoose.Types.ObjectId(req.params.id);
     const order = await OrderService.getOrder(id);
     if (!order) {
-      return res.status(404).json({ IsSuccess: false, ErrorMessage: `Order with id '${req.body._id}' wasn't found` });
+      return res.status(404).json({ IsSuccess: false, ErrorMessage: `Order with id '${id}' wasn't found` });
     }
     if (order.status !== ORDER_STATUSES.DRAFT) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: `Invalid order status` });
     }
-    if (!isValidDate(req.body.delivery.finalDate)) {
+    if (!isValidDate(req.body.finalDate)) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: `Invalid final date` });
     }
-    if (!isValidInput("City", req.body.delivery.address.city) || (req.body.delivery.address.city && req.body.delivery.address.city.trim().length !== req.body.delivery.address.city.length)) {
+    if (
+      !isValidInput("City", req.body.address.city) ||
+      (req.body.address.city && req.body.address.city.trim().length !== req.body.address.city.length)
+    ) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.DELIVERY });
     }
 
-    if (!isValidInput("Street", req.body.delivery.address.street) || (req.body.delivery.address.street && req.body.delivery.address.street.trim().length !== req.body.delivery.address.street.length)) {
+    if (
+      !isValidInput("Street", req.body.address.street) ||
+      (req.body.address.street && req.body.address.street.trim().length !== req.body.address.street.length)
+    ) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.DELIVERY });
     }
 
-    if (!isValidInput("House", req.body.delivery.address.house) || req.body.delivery.address.house < 1 || req.body.delivery.address.house > 999) {
+    if (!isValidInput("House", req.body.address.house) || req.body.address.house < 1 || req.body.address.house > 999) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.DELIVERY });
     }
 
-    if (!isValidInput("Flat", req.body.delivery.address.flat) || req.body.delivery.address.flat < 1 || req.body.delivery.address.flat > 9999) {
+    if (!isValidInput("Flat", req.body.address.flat) || req.body.address.flat < 1 || req.body.address.flat > 9999) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.DELIVERY });
     }
   } catch (e: any) {
@@ -160,16 +172,13 @@ export async function orderDelivery(req: Request, res: Response, next: NextFunct
 
 export async function orderCommentsCreate(req: Request, res: Response, next: NextFunction) {
   try {
-    if (!req.body._id) {
+    if (!req.params.id) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
     }
-    if (!req.body.comments || !req.body.comments.text) {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
-    }
-    
-    const replacedText = req.body.comments.text.replaceAll("\r", "").replaceAll("\n","")
 
-    if (!req.body.comments.text.length || replacedText.length > 250) {
+    const replacedText = req.body.comment.replaceAll("\r", "").replaceAll("\n", "");
+
+    if (!req.body.comment.length || replacedText.length > 250) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
     }
     next();
@@ -181,13 +190,15 @@ export async function orderCommentsCreate(req: Request, res: Response, next: Nex
 
 export async function orderCommentsDelete(req: Request, res: Response, next: NextFunction) {
   try {
-    if (!req.body._id) {
+    const orderId = req.params.id;
+    const commentId = req.params.commentId;
+    if (!orderId || !commentId) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
     }
-    if (!req.body.comments || !req.body.comments._id) {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
-    }
-    const comment = (await OrderService.getOrder(req.body._id)).comments.find((c) => c._id.toString() === req.body.comments._id);
+
+    const comment = (await OrderService.getOrder(new mongoose.Types.ObjectId(orderId))).comments.find(
+      (c) => c._id.toString() === commentId
+    );
     if (!comment) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.COMMENT_NOT_FOUND });
     }

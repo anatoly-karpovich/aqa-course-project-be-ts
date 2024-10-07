@@ -5,7 +5,11 @@ import type { ICustomer, IProduct, IDelivery, DocumentResult, IComment } from ".
 export interface IOrder<CustomerType> {
   readonly _id?: mongoose.Types.ObjectId;
   status: ORDER_STATUSES;
-  customer: CustomerType extends ICustomer ? ICustomer : CustomerType extends mongoose.Types.ObjectId ? mongoose.Types.ObjectId : string;
+  customer: CustomerType extends ICustomer
+    ? ICustomer
+    : CustomerType extends mongoose.Types.ObjectId
+    ? mongoose.Types.ObjectId
+    : string;
   products: IProductInOrder[];
   delivery: IDelivery | null;
   total_price: number;
@@ -15,21 +19,23 @@ export interface IOrder<CustomerType> {
 }
 
 export interface IProductInOrder extends IProduct {
-  received: boolean
+  received: boolean;
 }
 
 export interface IOrderRequest {
-  readonly _id?: mongoose.Types.ObjectId;
   customer: mongoose.Types.ObjectId;
   products: mongoose.Types.ObjectId[];
 }
 
-export interface IOrderDocument extends IOrder<mongoose.Types.ObjectId>, mongoose.Document, DocumentResult<IOrderDocument> {
+export interface IOrderDocument
+  extends IOrder<mongoose.Types.ObjectId>,
+    mongoose.Document,
+    DocumentResult<IOrderDocument> {
   readonly _id: mongoose.Types.ObjectId;
 }
 
 export interface IHistory {
-  readonly action: ORDER_HISTORY_ACTIONS
+  readonly action: ORDER_HISTORY_ACTIONS;
   readonly status: string;
   readonly customer: string;
   readonly products: IProduct[];

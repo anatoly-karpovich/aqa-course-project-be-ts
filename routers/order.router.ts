@@ -78,52 +78,6 @@ const orderRouter = Router();
  *           items:
  *             $ref: '#/components/schemas/OrderHistory'
  *           description: History of the order
- *       example:
- *         _id: "648870eb40c84614b7a8cd11"
- *         status: "In Process"
- *         customer:
- *           _id: "66f9d2695ea81af0e61adb59"
- *           email: "abcd@example.com"
- *           name: "Ira Swaniawski IV"
- *           country: "Great Britain"
- *           city: "Fort Jimmyton"
- *           street: "Howell Crest"
- *           house: 169
- *           flat: 6734
- *           phone: "+449807453699"
- *           createdOn: "2024-09-29T22:19:00.000Z"
- *           notes: "Notes here"
- *         products:
- *           - _id: "648870eb40c84614b7a8cd13"
- *             name: "Product 1"
- *             amount: 2
- *             price: 100
- *             manufacturer: "Apple"
- *             notes: "Test notes"
- *             received: false
- *         total_price: 200
- *         createdOn: "2023-09-29T12:00:00Z"
- *         delivery:
- *           finalDate: "2023-10-05T12:00:00Z"
- *           condition: "Delivery"
- *           address:
- *             country: "USA"
- *             city: "New York"
- *             street: "5th Avenue"
- *             house: 1
- *             flat: 101
- *         comments:
- *           - text: "Order placed"
- *             createdOn: "2023-09-29T12:05:00Z"
- *         history:
- *           - status: "Draft"
- *             customer: "66f9d2695ea81af0e61adb59"
- *             products:
- *               - _id: "648870eb40c84614b7a8cd13"
- *                 name: "Product 1"
- *             total_price: 200
- *             action: "Order created"
- *             changedOn: "2023-09-29T12:00:00Z"
  *
  *     OrderWithoutDelivery:
  *       type: object
@@ -220,12 +174,13 @@ const orderRouter = Router();
  *           - status: "Draft"
  *             customer: "66f9d2695ea81af0e61adb59"
  *             products:
- *               - _id: "66eb4139fd0a2ec681e705aa"
- *                 name: "Gloves48933"
- *               - _id: "66ef1332fd0a2ec681e725ad"
- *                 name: "Bike41263"
- *               - _id: "66ef12f5fd0a2ec681e725a1"
- *                 name: "Gloves57362"
+ *               - _id: "66eb3d8ffd0a2ec681e70581"
+ *                 name: "Ball1"
+ *                 amount: 22
+ *                 price: 101
+ *                 manufacturer: "Tesla"
+ *                 notes: "Test notes"
+ *                 received: false
  *             total_price: 300
  *             delivery: null
  *             changedOn: "2024-09-30T19:42:00.000Z"
@@ -277,11 +232,20 @@ const orderRouter = Router();
  *     Comment:
  *       type: object
  *       properties:
+ *         _id:
+ *           type: string
+ *           description: The auto-generated ID of the comment
  *         text:
  *           type: string
+ *           description: Comment text
  *         createdOn:
  *           type: string
  *           format: date-time
+ *           description: Date and time the comment was created
+ *       example:
+ *         _id: "645189c01b1eccc04f9aba5d"
+ *         text: "Great service!"
+ *         createdOn: "2023-09-29T12:05:00Z"
  *
  *     OrderHistory:
  *       type: object
@@ -474,7 +438,7 @@ orderRouter.get("/orders/:id", authmiddleware, orderById, OrderController.getOrd
 
 /**
  * @swagger
- * /api/orders:
+ * /api/orders/{id}:
  *   put:
  *     summary: Update an order
  *     tags: [Orders]
@@ -486,6 +450,12 @@ orderRouter.get("/orders/:id", authmiddleware, orderById, OrderController.getOrd
  *           type: string
  *           example: Bearer <JWT token>
  *         description: Bearer token for authentication
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the order to update
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -514,7 +484,7 @@ orderRouter.get("/orders/:id", authmiddleware, orderById, OrderController.getOrd
  */
 
 orderRouter.put(
-  "/orders",
+  "/orders/:id",
   authmiddleware,
   schemaMiddleware("orderUpdateSchema"),
   orderUpdateValidations,
