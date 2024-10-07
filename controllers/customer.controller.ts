@@ -12,12 +12,21 @@ class CustomerController {
     }
   }
 
-  async getAll(req: Request, res: Response) {
+  async getAll(req: Request, res: Response): Promise<Response> {
     try {
-      const customer = await CustomerService.getAll();
-      return res.json({ Customers: customer, IsSuccess: true, ErrorMessage: null });
+      const {
+        search = "",
+        sortField = "createdOn",
+        sortOrder = "desc",
+        country,
+      } = req.query as Record<string, string | undefined>;
+
+      const countries = (Array.isArray(country) ? country : country ? [country] : []) as string[];
+
+      const customers = await CustomerService.getSorted({ search, country: countries }, { sortField, sortOrder });
+      return res.json({ Customers: customers, IsSuccess: true, ErrorMessage: null });
     } catch (e: any) {
-      res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
+      return res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
     }
   }
 

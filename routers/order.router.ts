@@ -379,7 +379,7 @@ orderRouter.post(
  * @swagger
  * /api/orders:
  *   get:
- *     summary: Get the list of orders
+ *     summary: Get the list of orders with optional filters and sorting
  *     tags: [Orders]
  *     parameters:
  *       - in: header
@@ -389,6 +389,33 @@ orderRouter.post(
  *           type: string
  *           example: Bearer <JWT token>
  *         description: Bearer token for authentication
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search term for filtering orders by ID, customer name, customer email, total price, or status
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: string
+ *           example: ["In Process", "Draft"]
+ *         description: Filter orders by status
+ *       - in: query
+ *         name: sortField
+ *         schema:
+ *           type: string
+ *           enum: [createdOn, total_price, status]
+ *           example: createdOn
+ *         description: Field to sort by
+ *       - in: query
+ *         name: sortOrder
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           example: asc
+ *         description: Sort order (ascending or descending)
  *     security:
  *       - BearerAuth: []
  *     responses:

@@ -2,14 +2,47 @@ import { Types } from "mongoose";
 import type { IProduct } from "../data/types";
 import Product from "../models/product.model";
 import { getTodaysDate } from "../utils/utils";
+import { IProductFilters, IProductSortOptions } from "../data/types/product.type";
 
 class ProductsService {
   async create(product: IProduct): Promise<IProduct> {
-    const createdProduct = await Product.create({...product, createdOn: getTodaysDate(true)});
+    const createdProduct = await Product.create({ ...product, createdOn: getTodaysDate(true) });
     return createdProduct;
   }
 
-  async getAll(): Promise<IProduct[]> {
+  async getSorted(filters: IProductFilters, sortOptions: IProductSortOptions): Promise<IProduct[]> {
+    const { manufacturers, search } = filters;
+    let filter: Record<string, any> = {};
+
+    if (manufacturers && manufacturers.length > 0) {
+      filter.manufacturer = { $in: manufacturers };
+    }
+
+    if (search && search.trim() !== "") {
+      const searchRegex = new RegExp(search, "i");
+      const searchNumber = parseFloat(search);
+
+      if (!isNaN(searchNumber)) {
+        filter.$or = [
+          { name: { $regex: searchRegex } },
+          { manufacturer: { $regex: searchRegex } },
+          { price: searchNumber },
+        ];
+      }
+    }
+
+    const sort: Record<string, 1 | -1> = {};
+    if (sortOptions.sortField && sortOptions.sortOrder) {
+      sort[sortOptions.sortField] = sortOptions.sortOrder === "asc" ? 1 : -1;
+    } else {
+      sort["createdOn"] = 1;
+    }
+
+    const products = await Product.find(filter).sort(sort).exec();
+    return products;
+  }
+
+  async getAll() {
     const products = await Product.find();
     return products.reverse();
   }

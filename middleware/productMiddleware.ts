@@ -6,24 +6,23 @@ import OrderService from "../services/order.service.js";
 
 export async function uniqueProduct(req: Request, res: Response, next: NextFunction) {
   try {
-  const product = (await ProductsService.getAll()).find((c) => {
-    return req.body._id 
-    ? (c.name === req.body.name && c._id.toString() !== req.body._id)
-    : c.name === req.body.name
-  })
-  if (product) {
-    return res.status(409).json({ IsSuccess: false, ErrorMessage: `Product with name '${req.body.name}' already exists` });
+    const product = (await ProductsService.getAll()).find((c) => {
+      return req.body._id ? c.name === req.body.name && c._id.toString() !== req.body._id : c.name === req.body.name;
+    });
+    if (product) {
+      return res
+        .status(409)
+        .json({ IsSuccess: false, ErrorMessage: `Product with name '${req.body.name}' already exists` });
+    }
+  } catch (e: any) {
+    console.log(e);
+    return res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
   }
-} catch (e: any) {
-  console.log(e);
-  return res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
-}  
   next();
 }
 
 export async function productValidations(req: Request, res: Response, next: NextFunction) {
   try {
-
     if (!isValidInput("Product Name", req.body.name) || req.body.name.trim().length !== req.body.name.length) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
     }
@@ -33,8 +32,12 @@ export async function productValidations(req: Request, res: Response, next: Next
     if (!isValidInput("Price", req.body.price) || req.body.price <= 0 || req.body.price > 99999) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
     }
-    if (req.body.notes && (!isValidInput("Notes", req.body.notes) || req.body.notes.trim().length !== req.body.notes.length 
-    || (req.body.notes.trim().replaceAll("\r", "").replaceAll("\n","")).length > 250)) {
+    if (
+      req.body.notes &&
+      (!isValidInput("Notes", req.body.notes) ||
+        req.body.notes.trim().length !== req.body.notes.length ||
+        req.body.notes.trim().replaceAll("\r", "").replaceAll("\n", "").length > 250)
+    ) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
     }
     if (!Object.values(MANUFACTURERS).includes(req.body.manufacturer)) {
@@ -63,9 +66,13 @@ export async function productById(req: Request, res: Response, next: NextFunctio
 
 export async function deleteProduct(req: Request, res: Response, next: NextFunction) {
   try {
-    const isAssignedToOrder = (await OrderService.getAll()).some(o => o.products.some(r => r._id.toString() === req.params.id));
+    const isAssignedToOrder = (await OrderService.getAll()).some((o) =>
+      o.products.some((r) => r._id.toString() === req.params.id)
+    );
     if (isAssignedToOrder) {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: `Not allowed to delete product, assigned to the order` });
+      return res
+        .status(400)
+        .json({ IsSuccess: false, ErrorMessage: `Not allowed to delete product, assigned to the order` });
     }
     next();
   } catch (e: any) {
