@@ -1,6 +1,7 @@
 import ProductsService from "../services/products.service.js";
 import { Request, Response } from "express";
 import mongoose from "mongoose";
+import { IProductFilters, IProductSortOptions } from "../data/types/product.type.js";
 
 class ProductsController {
   async create(req: Request, res: Response) {
@@ -14,10 +15,32 @@ class ProductsController {
 
   async getAll(req: Request, res: Response) {
     try {
-      const products = await ProductsService.getAll();
+      const {
+        search = "",
+        sortField = "createdOn",
+        sortOrder = "desc",
+      } = req.query as Record<string, string | undefined>;
+
+      const manufacturers = Array.isArray(req.query.manufacturer)
+        ? req.query.manufacturer
+        : req.query.manufacturer
+        ? [req.query.manufacturer]
+        : [];
+
+      const filters: IProductFilters = {
+        manufacturers: manufacturers as string[],
+        search,
+      };
+
+      const sortOptions: IProductSortOptions = {
+        sortField: sortField as "name" | "price" | "manufacturer" | "createdOn",
+        sortOrder: sortOrder as "asc" | "desc",
+      };
+
+      const products = await ProductsService.getSorted(filters, sortOptions);
       return res.json({ Products: products, IsSuccess: true, ErrorMessage: null });
     } catch (e: any) {
-      res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
+      return res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
     }
   }
 

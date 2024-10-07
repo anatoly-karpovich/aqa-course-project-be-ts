@@ -88,7 +88,7 @@ const productsRouter = Router();
  * @swagger
  * /api/products:
  *   get:
- *     summary: Get the list of products
+ *     summary: Get the list of products with optional filters and sorting
  *     tags: [Products]
  *     parameters:
  *       - in: header
@@ -98,6 +98,33 @@ const productsRouter = Router();
  *           type: string
  *           example: Bearer <JWT token>
  *         description: Bearer token for authentication
+ *       - in: query
+ *         name: manufacturer
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: string
+ *           example: ["Apple", "Samsung"]
+ *         description: Filter products by manufacturer(s)
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search term for filtering products by name, manufacturer, or price
+ *       - in: query
+ *         name: sortField
+ *         schema:
+ *           type: string
+ *           enum: [name, price, manufacturer, createdOn]
+ *           example: name
+ *         description: Field to sort by
+ *       - in: query
+ *         name: sortOrder
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           example: asc
+ *         description: Sort order (ascending or descending)
  *     security:
  *       - BearerAuth: []
  *     responses:

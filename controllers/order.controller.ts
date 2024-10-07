@@ -13,13 +13,23 @@ class OrderController {
     }
   }
 
-  async getAll(req: Request, res: Response) {
+  async getAll(req: Request, res: Response): Promise<Response> {
     try {
-      const orders = await OrderService.getAll();
+      const {
+        search = "",
+        sortField = "createdOn",
+        sortOrder = "asc",
+      } = req.query as Record<string, string | undefined>;
+
+      const statuses = (
+        Array.isArray(req.query.status) ? req.query.status : req.query.status ? [req.query.status] : []
+      ) as string[];
+
+      const orders = await OrderService.getSorted({ search, status: statuses }, { sortField, sortOrder });
       return res.status(200).json({ Orders: orders, IsSuccess: true, ErrorMessage: null });
     } catch (e: any) {
       console.log(e);
-      res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
+      return res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
     }
   }
 
@@ -44,7 +54,7 @@ class OrderController {
     }
   }
 
-  async delete(req: Request, res: Response):Promise<Response<any, Record<string, any>>> {
+  async delete(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
     try {
       const id = new mongoose.Types.ObjectId(req.params.id);
       const order = await OrderService.delete(id);

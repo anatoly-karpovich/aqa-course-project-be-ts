@@ -15,3 +15,13 @@ export interface IProduct extends DocumentResult<IProduct> {
 export interface IProductDocument extends IProduct, mongoose.Document {
   _id?: Types.ObjectId;
 }
+
+export interface IProductFilters {
+  manufacturers?: string | string[];
+  search: string;
+}
+
+export interface IProductSortOptions {
+  sortField?: "name" | "price" | "manufacturer" | "createdOn";
+  sortOrder?: "asc" | "desc";
+}

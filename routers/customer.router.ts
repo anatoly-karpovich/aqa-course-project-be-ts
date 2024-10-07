@@ -208,7 +208,7 @@ customerRouter.post(
  * @swagger
  * /api/customers:
  *   get:
- *     summary: Get the list of customers
+ *     summary: Get the list of customers with optional filters and sorting
  *     tags: [Customers]
  *     parameters:
  *       - in: header
@@ -218,6 +218,33 @@ customerRouter.post(
  *           type: string
  *           example: Bearer <JWT token>
  *         description: Bearer token for authentication
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search term for filtering customers by email, name, or country
+ *       - in: query
+ *         name: country
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: string
+ *           example: ["USA", "Canada"]
+ *         description: Filter customers by country
+ *       - in: query
+ *         name: sortField
+ *         schema:
+ *           type: string
+ *           enum: [email, name, country, createdOn]
+ *           example: name
+ *         description: Field to sort by
+ *       - in: query
+ *         name: sortOrder
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           example: asc
+ *         description: Sort order (ascending or descending)
  *     security:
  *       - BearerAuth: []
  *     responses:
@@ -231,8 +258,6 @@ customerRouter.post(
  *                 $ref: '#/components/schemas/Customer'
  *       401:
  *         description: Unauthorized, missing or invalid token
- *       404:
- *         description: No customers found
  *       500:
  *         description: Server error
  */
