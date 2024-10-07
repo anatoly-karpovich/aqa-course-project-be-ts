@@ -10,68 +10,58 @@ const orderDeliveryRouter = Router();
  * @swagger
  * components:
  *   schemas:
- *     OrderDelivery:
+ *     Delivery:
  *       type: object
  *       required:
- *         - _id
- *         - delivery
+ *         - finalDate
+ *         - condition
+ *         - address
  *       properties:
- *         _id:
+ *         finalDate:
  *           type: string
- *           description: The order ID
- *         delivery:
+ *           format: date
+ *           description: The final delivery date
+ *         condition:
+ *           type: string
+ *           enum: [Delivery, Pickup]
+ *           description: The delivery condition (e.g., Delivery or Pickup)
+ *         address:
  *           type: object
  *           required:
- *             - finalDate
- *             - condition
- *             - address
+ *             - country
+ *             - city
+ *             - street
+ *             - house
+ *             - flat
  *           properties:
- *             finalDate:
+ *             country:
  *               type: string
- *               format: date
- *               description: The final delivery date
- *             condition:
+ *               enum: [USA, Canada, Belarus, Ukraine, Germany, France, Great Britain, Russia]
+ *               description: The country of the address
+ *             city:
  *               type: string
- *               enum: [Delivery, Pickup]
- *               description: The delivery condition (e.g., Delivery or Pickup)
- *             address:
- *               type: object
- *               required:
- *                 - country
- *                 - city
- *                 - street
- *                 - house
- *                 - flat
- *               properties:
- *                 country:
- *                   type: string
- *                   enum: [USA, Canada, Belarus, Ukraine, Germany, France, Great Britain, Russia]
- *                   description: The country of the address
- *                 city:
- *                   type: string
- *                   description: The city of the address
- *                 street:
- *                   type: string
- *                   description: The street of the address
- *                 house:
- *                   type: number
- *                   description: The house number
- *                 flat:
- *                   type: number
- *                   description: The flat number
+ *               description: The city of the address
+ *             street:
+ *               type: string
+ *               description: The street of the address
+ *             house:
+ *               type: integer
+ *               description: The house number
+ *             flat:
+ *               type: integer
+ *               description: The flat number
  *       example:
- *         _id: "644e9c138ec7cfb87585643d"
- *         delivery:
- *           finalDate: "2023/04/30"
- *           condition: "Pickup"
- *           address:
- *             country: "USA"
- *             city: "Homel"
- *             street: "Best street"
- *             house: 5
- *             flat: 1
+ *         finalDate: "2023-04-30"
+ *         condition: "Pickup"
+ *         address:
+ *           country: "USA"
+ *           city: "New York"
+ *           street: "5th Avenue"
+ *           house: 1
+ *           flat: 101
+
  *
- * /api/orders/delivery:
+* /api/orders/{id}/delivery:
  *   post:
  *     summary: Update delivery details of an order
  *     tags: [Orders]
@@ -83,6 +73,12 @@ const orderDeliveryRouter = Router();
  *           type: string
  *           example: Bearer <JWT token>
  *         description: Bearer token for authentication
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the order
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -90,7 +86,7 @@ const orderDeliveryRouter = Router();
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/OrderDelivery'
+ *             $ref: '#/components/schemas/Delivery'
  *     responses:
  *       200:
  *         description: The order delivery details were successfully updated
@@ -108,7 +104,7 @@ const orderDeliveryRouter = Router();
  *         description: Server error
  */
 orderDeliveryRouter.post(
-  "/orders/delivery",
+  "/orders/:id/delivery",
   authmiddleware,
   schemaMiddleware("orderDeliverySchema"),
   orderById,

@@ -13,19 +13,16 @@ const orderReceiveRouter = Router();
  *     OrderReceive:
  *       type: object
  *       required:
- *         - _id
  *         - products
  *       properties:
- *         _id:
- *           type: string
- *           description: The order ID
  *         products:
  *           type: array
  *           items:
  *             type: string
+ *           maxItems: 5
+ *           minItems: 1
  *           description: List of product IDs being received, can contain up to 5 identical products
  *       example:
- *         _id: "644e9c138ec7cfb87585643d"
  *         products:
  *           - "6447bd766e52f1d354d2f0bf"
  *           - "6447bd766e52f1d354d2f0bf"
@@ -33,7 +30,7 @@ const orderReceiveRouter = Router();
  *           - "6447bd766e52f1d354d2f0bf"
  *           - "6447bd766e52f1d354d2f0bf"
  *
- * /api/orders/receive:
+ * /api/orders/{id}/receive:
  *   post:
  *     summary: Mark products as received in an order
  *     tags: [Orders]
@@ -45,6 +42,12 @@ const orderReceiveRouter = Router();
  *           type: string
  *           example: Bearer <JWT token>
  *         description: Bearer token for authentication
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the order
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -70,7 +73,7 @@ const orderReceiveRouter = Router();
  *         description: Server error
  */
 orderReceiveRouter.post(
-  "/orders/receive",
+  "/orders/:id/receive",
   authmiddleware,
   schemaMiddleware("orderReceiveSchema"),
   orderReceiveValidations,

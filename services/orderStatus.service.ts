@@ -8,19 +8,19 @@ import { Types } from "mongoose";
 import { ORDER_HISTORY_ACTIONS, ORDER_STATUSES } from "../data/enums";
 
 class OrderStatusService {
-  async updateStatus(order: Pick<IOrder<Types.ObjectId>, "_id" | "status">): Promise<IOrder<ICustomer>> {
-    if (!order._id) {
+  async updateStatus(orderId: Types.ObjectId, status: string): Promise<IOrder<ICustomer>> {
+    if (!orderId) {
       throw new Error("Id was not provided");
     }
-    const orderFromDB = await OrderService.getOrder(order._id);
+    const orderFromDB = await OrderService.getOrder(orderId);
     const newOrder: IOrder<string> = {
       ...orderFromDB,
       customer: orderFromDB.customer._id.toString(),
-      status: order.status,
+      status: status as ORDER_STATUSES,
     };
-    let action: ORDER_HISTORY_ACTIONS
-    if(order.status === ORDER_STATUSES.IN_PROCESS) action = ORDER_HISTORY_ACTIONS.PROCESSED
-    if(order.status === ORDER_STATUSES.CANCELED) action = ORDER_HISTORY_ACTIONS.CANCELED
+    let action: ORDER_HISTORY_ACTIONS;
+    if (status === ORDER_STATUSES.IN_PROCESS) action = ORDER_HISTORY_ACTIONS.PROCESSED;
+    if (status === ORDER_STATUSES.CANCELED) action = ORDER_HISTORY_ACTIONS.CANCELED;
 
     newOrder.history.unshift(createHistoryEntry(newOrder, action));
     const updatedOrder = await Order.findByIdAndUpdate(newOrder._id, newOrder, { new: true });
