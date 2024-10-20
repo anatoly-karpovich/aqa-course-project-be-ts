@@ -139,6 +139,17 @@ class OrderService {
     const customer = await CustomerService.getCustomer(order.customer);
     return { ...order._doc, customer };
   }
+
+  async getOrdersByCustomer(customerId: string) {
+    if (!customerId) {
+      throw new Error("Customer ID was not provided");
+    }
+
+    // Assuming that the `customer` field in the order contains the customer's ID
+    const orders = await Order.find({ customer: customerId });
+
+    return orders;
+  }
 }
 
 export default new OrderService();

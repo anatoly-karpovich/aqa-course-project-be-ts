@@ -11,15 +11,11 @@ import fileUpload from "express-fileupload";
 import swaggerDocs from "./utils/swagger.js";
 import orderDeliveryRouter from "./routers/orderDelivery.router";
 import { errorHandleMiddleware } from "./middleware/errorHandleMiddleware";
-import { authmiddleware } from "./middleware/authmiddleware";
 import cors from "cors";
 import orderCommentsRouter from "./routers/orderComments.router";
 import rebatesRouter from "./routers/rebates.router";
-// import swaggerjJsdoc from 'swagger-jsdoc'
-// import swaggerUi from 'swagger-ui-express'
-// import  pkg  from './package.json' assert { type: "json" }
+import customerOrdersRouter from "./routers/customer.orders.router";
 
-// const { version } = pkg
 dotenv.config();
 
 const DB_URL = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.j9uiirp.mongodb.net/?retryWrites=true&w=majority`;
@@ -38,24 +34,6 @@ const cors_options: cors.CorsOptions = {
   optionsSuccessStatus: 200,
 };
 
-// app.use(function (req, res, next) {
-//   // Website you wish to allow to connect
-//   res.setHeader("Access-Control-Allow-Origin", "http://127.0.0.1:5502");
-//   // res.setHeader("Access-Control-Allow-Origin", "*");
-
-//   // Request methods you wish to allow
-//   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
-
-//   // Request headers you wish to allow
-//   res.setHeader("Access-Control-Allow-Headers", ["Authorization", "X-Requested-With,content-type"]);
-
-//   // Set to true if you need the website to include cookies in the requests sent
-//   // to the API (e.g. in case you use sessions)
-//   res.setHeader("Access-Control-Allow-Credentials", "true");
-
-//   // Pass to next layer of middleware
-//   next();
-// });
 app.use(cors(cors_options));
 app.options("*", cors());
 app.use(express.json());
@@ -71,6 +49,7 @@ app.use("/api", orderStatusRouter);
 app.use("/api", orderReceiveRouter);
 app.use("/api", orderDeliveryRouter);
 app.use("/api", orderCommentsRouter);
+app.use("/api", customerOrdersRouter);
 app.use(errorHandleMiddleware);
 
 async function startApp() {
