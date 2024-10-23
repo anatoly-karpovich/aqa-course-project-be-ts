@@ -9,7 +9,7 @@ const customerOrdersRouter = express.Router();
  * /api/customers/{customerId}/orders:
  *   get:
  *     summary: Get all orders associated with the specified customer
- *     tags: [Orders]
+ *     tags: [Customers]
  *     parameters:
  *       - in: header
  *         name: Authorization

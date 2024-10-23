@@ -15,6 +15,7 @@ import cors from "cors";
 import orderCommentsRouter from "./routers/orderComments.router";
 import rebatesRouter from "./routers/rebates.router";
 import customerOrdersRouter from "./routers/customer.orders.router";
+import metricsRouter from "./routers/metrics.router";
 
 dotenv.config();
 
@@ -50,6 +51,7 @@ app.use("/api", orderReceiveRouter);
 app.use("/api", orderDeliveryRouter);
 app.use("/api", orderCommentsRouter);
 app.use("/api", customerOrdersRouter);
+app.use("/api", metricsRouter);
 app.use(errorHandleMiddleware);
 
 async function startApp() {
