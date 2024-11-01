@@ -17,7 +17,6 @@ class ProductsService {
     if (manufacturers && manufacturers.length > 0) {
       filter.manufacturer = { $in: manufacturers };
     }
-
     if (search && search.trim() !== "") {
       const searchRegex = new RegExp(search, "i");
       const searchNumber = parseFloat(search);
@@ -28,6 +27,8 @@ class ProductsService {
           { manufacturer: { $regex: searchRegex } },
           { price: searchNumber },
         ];
+      } else {
+        filter.$or = [{ name: { $regex: searchRegex } }, { manufacturer: { $regex: searchRegex } }];
       }
     }
 

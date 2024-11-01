@@ -24,9 +24,9 @@ class CustomerService {
     if (country.length > 0) {
       filter.country = { $in: country };
     }
+    const searchRegex = new RegExp(search, "i");
 
     if (search && search.trim() !== "") {
-      const searchRegex = new RegExp(search, "i");
       filter.$or = [
         { email: { $regex: searchRegex } },
         { name: { $regex: searchRegex } },
