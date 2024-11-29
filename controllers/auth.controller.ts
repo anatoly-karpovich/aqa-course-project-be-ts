@@ -51,7 +51,7 @@ class AuthController {
         return res.status(400).json({ IsSuccess: false, ErrorMessage: `Incorrect credentials` });
       }
       const token = generateAccessToken(user._id, user.roles);
-      return res.json({ token, IsSuccess: true, ErrorMessage: null });
+      return res.header("Authorization", token).json({ IsSuccess: true, ErrorMessage: null });
     } catch (e) {
       console.log(e);
       res.status(400).json({ IsSuccess: false, ErrorMessage: "Login error" });
