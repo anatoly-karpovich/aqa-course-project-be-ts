@@ -42,7 +42,8 @@ class CustomerController {
 
   async update(req: Request, res: Response) {
     try {
-      const updatedCustomer = await CustomerService.update(req.body);
+      const id = new mongoose.Types.ObjectId(req.params.id);
+      const updatedCustomer = await CustomerService.update({ ...req.body, ...{ _id: id } });
       return res.json({ Customer: updatedCustomer, IsSuccess: true, ErrorMessage: null });
     } catch (e: any) {
       res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });

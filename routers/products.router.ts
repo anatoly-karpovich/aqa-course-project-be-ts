@@ -258,7 +258,7 @@ productsRouter.post(
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Product'
+ *             $ref: '#/components/schemas/ProductWithoutId'
  *     responses:
  *       200:
  *         description: The product was successfully updated
@@ -279,7 +279,7 @@ productsRouter.post(
  */
 
 productsRouter.put(
-  "/products",
+  "/products/:id",
   authmiddleware,
   schemaMiddleware("productSchema"),
   uniqueProduct,

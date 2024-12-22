@@ -328,7 +328,7 @@ customerRouter.get("/customers/:id", authmiddleware, customerById, CustomerContr
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Customer'
+ *             $ref: '#/components/schemas/CustomerWithoutId'
  *     responses:
  *       200:
  *         description: The customer was successfully updated
@@ -348,7 +348,7 @@ customerRouter.get("/customers/:id", authmiddleware, customerById, CustomerContr
  *         description: Server error
  */
 customerRouter.put(
-  "/customers",
+  "/customers/:id",
   authmiddleware,
   schemaMiddleware("customerSchema"),
   uniqueCustomer,

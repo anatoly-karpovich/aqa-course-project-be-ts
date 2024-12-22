@@ -56,7 +56,8 @@ class ProductsController {
 
   async update(req: Request, res: Response) {
     try {
-      const updatedProduct = await ProductsService.update(req.body);
+      const id = new mongoose.Types.ObjectId(req.params.id);
+      const updatedProduct = await ProductsService.update({ ...req.body, _id: id });
       return res.json({ Product: updatedProduct, IsSuccess: true, ErrorMessage: null });
     } catch (e: any) {
       res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });

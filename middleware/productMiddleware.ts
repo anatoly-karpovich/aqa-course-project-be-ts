@@ -6,8 +6,9 @@ import OrderService from "../services/order.service.js";
 
 export async function uniqueProduct(req: Request, res: Response, next: NextFunction) {
   try {
+    const id = req.body._id ?? req.params.id;
     const product = (await ProductsService.getAll()).find((c) => {
-      return req.body._id ? c.name === req.body.name && c._id.toString() !== req.body._id : c.name === req.body.name;
+      return id ? c.name === req.body.name && c._id.toString() !== id : c.name === req.body.name;
     });
     if (product) {
       return res
