@@ -1,8 +1,8 @@
 import { Types } from "mongoose";
 import type { IProduct } from "../data/types";
 import Product from "../models/product.model";
-import { getTodaysDate } from "../utils/utils";
-import { IProductFilters, IProductSortOptions } from "../data/types/product.type";
+import { customSort, getTodaysDate } from "../utils/utils";
+import { IProductFilters } from "../data/types/product.type";
 
 class ProductsService {
   async create(product: IProduct): Promise<IProduct> {
@@ -10,7 +10,10 @@ class ProductsService {
     return createdProduct;
   }
 
-  async getSorted(filters: IProductFilters, sortOptions: IProductSortOptions): Promise<IProduct[]> {
+  async getSorted(
+    filters: IProductFilters,
+    sortOptions: { sortField: string; sortOrder: string }
+  ): Promise<IProduct[]> {
     const { manufacturers, search } = filters;
     let filter: Record<string, any> = {};
 
@@ -32,15 +35,9 @@ class ProductsService {
       }
     }
 
-    const sort: Record<string, 1 | -1> = {};
-    if (sortOptions.sortField && sortOptions.sortOrder) {
-      sort[sortOptions.sortField] = sortOptions.sortOrder === "asc" ? 1 : -1;
-    } else {
-      sort["createdOn"] = 1;
-    }
+    const products = await Product.find(filter).exec();
 
-    const products = await Product.find(filter).sort(sort).exec();
-    return products;
+    return customSort(products, sortOptions);
   }
 
   async getAll() {

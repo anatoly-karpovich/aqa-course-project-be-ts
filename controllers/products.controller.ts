@@ -1,7 +1,7 @@
 import ProductsService from "../services/products.service.js";
 import { Request, Response } from "express";
 import mongoose from "mongoose";
-import { IProductFilters, IProductSortOptions } from "../data/types/product.type.js";
+import { IProductFilters } from "../data/types/product.type.js";
 
 class ProductsController {
   async create(req: Request, res: Response) {
@@ -32,13 +32,13 @@ class ProductsController {
         search,
       };
 
-      const sortOptions: IProductSortOptions = {
+      const sortOptions = {
         sortField: sortField as "name" | "price" | "manufacturer" | "createdOn",
         sortOrder: sortOrder as "asc" | "desc",
       };
 
       const products = await ProductsService.getSorted(filters, sortOptions);
-      return res.json({ Products: products, IsSuccess: true, ErrorMessage: null });
+      return res.json({ Products: products, sorting: { sortField, sortOrder }, IsSuccess: true, ErrorMessage: null });
     } catch (e: any) {
       return res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
     }

@@ -8,7 +8,7 @@ export interface IProduct extends DocumentResult<IProduct> {
   amount: number;
   price: number;
   manufacturer: MANUFACTURERS;
-  createdOn: number;
+  createdOn: string;
   notes?: string;
 }
 
@@ -19,9 +19,4 @@ export interface IProductDocument extends IProduct, mongoose.Document {
 export interface IProductFilters {
   manufacturers?: string | string[];
   search: string;
-}
-
-export interface IProductSortOptions {
-  sortField?: "name" | "price" | "manufacturer" | "createdOn";
-  sortOrder?: "asc" | "desc";
 }

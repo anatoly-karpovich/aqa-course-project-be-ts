@@ -2,7 +2,7 @@ import Order from "../models/order.model";
 import CustomerService from "./customer.service";
 import { IOrder, IOrderRequest, ICustomer } from "../data/types";
 import type { Types } from "mongoose";
-import { getTotalPrice, createHistoryEntry, productsMapping, getTodaysDate } from "../utils/utils";
+import { getTotalPrice, createHistoryEntry, productsMapping, getTodaysDate, customSort } from "../utils/utils";
 import { ORDER_HISTORY_ACTIONS, ORDER_STATUSES } from "../data/enums";
 import _ from "lodash";
 import mongoose from "mongoose";
@@ -40,7 +40,7 @@ class OrderService {
 
   async getSorted(
     filters: { search?: string; status?: string[] },
-    sortOptions: { sortField?: string; sortOrder?: string }
+    sortOptions: { sortField: string; sortOrder: string }
   ): Promise<IOrder<ICustomer>[]> {
     const { search = "", status = [] } = filters;
 
@@ -74,16 +74,7 @@ class OrderService {
       orders = orders.filter((order) => status.includes(order.status));
     }
 
-    if (sortOptions.sortField && sortOptions.sortOrder) {
-      const sortDirection = sortOptions.sortOrder === "asc" ? 1 : -1;
-      orders.sort((a, b) => {
-        if (a[sortOptions.sortField] < b[sortOptions.sortField]) return -1 * sortDirection;
-        if (a[sortOptions.sortField] > b[sortOptions.sortField]) return 1 * sortDirection;
-        return 0;
-      });
-    }
-
-    return orders;
+    return customSort(orders, sortOptions);
   }
 
   async getOrder(id: Types.ObjectId): Promise<IOrder<ICustomer>> {

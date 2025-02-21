@@ -26,7 +26,9 @@ class OrderController {
       ) as string[];
 
       const orders = await OrderService.getSorted({ search, status: statuses }, { sortField, sortOrder });
-      return res.status(200).json({ Orders: orders, IsSuccess: true, ErrorMessage: null });
+      return res
+        .status(200)
+        .json({ Orders: orders, sorting: { sortField, sortOrder }, IsSuccess: true, ErrorMessage: null });
     } catch (e: any) {
       console.log(e);
       return res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });

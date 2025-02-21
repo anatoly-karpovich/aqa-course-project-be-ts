@@ -1,7 +1,7 @@
 import Customer from "../models/customer.model";
 import type { ICustomer } from "../data/types";
 import { Types } from "mongoose";
-import { getTodaysDate } from "../utils/utils";
+import { customSort, getTodaysDate } from "../utils/utils";
 
 class CustomerService {
   async create(customer: ICustomer): Promise<ICustomer> {
@@ -34,15 +34,8 @@ class CustomerService {
       ];
     }
 
-    const sort: Record<string, 1 | -1> = {};
-    if (sortOptions.sortField && sortOptions.sortOrder) {
-      sort[sortOptions.sortField] = sortOptions.sortOrder === "asc" ? 1 : -1;
-    } else {
-      sort["createdOn"] = 1;
-    }
-
-    const customers = await Customer.find(filter).sort(sort).exec();
-    return customers;
+    const customers = await Customer.find(filter).exec();
+    return customSort(customers, sortOptions);
   }
 
   async getCustomer(id: Types.ObjectId): Promise<ICustomer> {

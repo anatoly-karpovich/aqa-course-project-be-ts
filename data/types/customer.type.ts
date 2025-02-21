@@ -12,7 +12,7 @@ export interface ICustomer {
   house: number;
   flat: number;
   phone: string;
-  createdOn: number;
+  createdOn: string;
   notes?: string;
 }
 

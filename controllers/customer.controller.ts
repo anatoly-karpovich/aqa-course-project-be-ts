@@ -24,7 +24,7 @@ class CustomerController {
       const countries = (Array.isArray(country) ? country : country ? [country] : []) as string[];
 
       const customers = await CustomerService.getSorted({ search, country: countries }, { sortField, sortOrder });
-      return res.json({ Customers: customers, IsSuccess: true, ErrorMessage: null });
+      return res.json({ Customers: customers, sorting: { sortField, sortOrder }, IsSuccess: true, ErrorMessage: null });
     } catch (e: any) {
       return res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
     }
