@@ -44,9 +44,6 @@ const authRouter = Router();
  *             schema:
  *               type: object
  *               properties:
- *                 token:
- *                   type: string
- *                   description: JWT access token
  *                 IsSuccess:
  *                   type: boolean
  *                   description: Operation success flag
@@ -55,6 +52,60 @@ const authRouter = Router();
  *                   nullable: true
  *       400:
  *         description: Incorrect credentials or login error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 IsSuccess:
+ *                   type: boolean
+ *                   description: Operation success flag
+ *                 ErrorMessage:
+ *                   type: string
+ *                   description: Error message in case of failure
+ * /api/logout:
+ *   post:
+ *     summary: User logout
+ *     tags: [Auth]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: Bearer <JWT token>
+ *         description: Bearer token for authentication
+ *     responses:
+ *       200:
+ *         description: Successfully logged out, active session is removed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 IsSuccess:
+ *                   type: boolean
+ *                   description: Operation success flag
+ *                 ErrorMessage:
+ *                   type: string
+ *                   nullable: true
+ *       401:
+ *         description: Unauthorized - No valid token provided
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 IsSuccess:
+ *                   type: boolean
+ *                   description: Operation success flag
+ *                 ErrorMessage:
+ *                   type: string
+ *                   description: Error message in case of failure
+ *       500:
+ *         description: Server error during logout
  *         content:
  *           application/json:
  *             schema:
@@ -77,6 +128,7 @@ authRouter.post(
   AuthController.registration
 );
 authRouter.post("/login", AuthController.login);
+authRouter.post("/logout", authmiddleware, AuthController.logout);
 // authRouter.get('/users', authmiddleware, AuthController.getUsers) FOR CHECHING AUTHORIZATION
 // authRouter.get('/users', roleMiddleware(ROLES.ADMIN), AuthController.getUsers)
 

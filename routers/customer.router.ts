@@ -95,7 +95,6 @@ const customerRouter = Router();
  *         - house
  *         - flat
  *         - phone
- *         - createdOn
  *       properties:
  *         email:
  *           type: string
@@ -130,10 +129,6 @@ const customerRouter = Router();
  *         phone:
  *           type: string
  *           description: The customer's phone number
- *         createdOn:
- *           type: string
- *           format: date-time
- *           description: The date the customer was created
  *         notes:
  *           type: string
  *           description: Additional notes about the customer
@@ -146,7 +141,6 @@ const customerRouter = Router();
  *         "house": 123
  *         "flat": 45
  *         "phone": "+155512345678"
- *         "createdOn": "2024-09-28T14:00:00Z"
  *         "notes": "Frequent customer"
  */
 

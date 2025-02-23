@@ -34,6 +34,10 @@ const productsRouter = Router();
  *           type: string
  *           enum: [Apple, Samsung, Google, Microsoft, Sony, Xiaomi, Amazon, Tesla]
  *           description: The products manufactirer
+ *         createdOn:
+ *           type: string
+ *           format: date-time
+ *           description: The date the product was created
  *         notes:
  *           type: string
  *           description: The products notes
@@ -43,6 +47,7 @@ const productsRouter = Router();
  *         "amount": 1
  *         "price": 1
  *         "manufacturer": "Apple"
+ *         "createdOn": "2024-09-28T14:00:00Z"
  *         "notes": "note 1"
  *
  *     ProductWithoutId:
