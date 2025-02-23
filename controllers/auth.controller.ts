@@ -69,6 +69,21 @@ class AuthController {
         return res.status(400).json({ IsSuccess: false, ErrorMessage: "Incorrect credentials" });
       }
 
+      const now = new Date();
+
+      const existingToken = await Token.findOne({
+        userId: user._id,
+        expiresAt: { $gt: now },
+      });
+
+      if (existingToken) {
+        return res.header("Authorization", existingToken.token).json({
+          IsSuccess: true,
+          Token: existingToken.token,
+          ErrorMessage: null,
+        });
+      }
+
       await Token.deleteMany({ expiresAt: { $lt: new Date() } });
 
       const token = generateAccessToken(user._id, user.roles);
