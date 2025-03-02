@@ -1,0 +1,40 @@
+import { IUser, IUserWithRoles } from "../data/types/users.types";
+import User from "../models/user.model";
+import { getTodaysDate } from "../utils/utils";
+import Role from "../models/role.model";
+import { ROLES } from "../data/enums";
+import bcrypt from "bcrypt";
+import _ from "lodash";
+
+class UsersService {
+  async create(user: IUser): Promise<IUserWithRoles> {
+    const hashPassword = bcrypt.hashSync(user.password, 7);
+    const userRole = await Role.findOne({ value: ROLES.USER });
+    const registeredUser = await User.create({
+      ...user,
+      password: hashPassword,
+      roles: [userRole.value],
+      createdOn: getTodaysDate(true),
+    });
+    return _.omit(registeredUser.toObject(), ["password"]);
+  }
+
+  async delete(id: string) {
+    return await User.findByIdAndDelete(id);
+  }
+
+  async getUser(id: string) {
+    const user = await User.findById(id);
+    return _.omit(user.toObject(), ["password"]);
+  }
+
+  async getUsers() {
+    const users = (await User.find()).map((user) => {
+      return _.omit(user.toObject(), ["password"]);
+    });
+
+    return users;
+  }
+}
+
+export default new UsersService();

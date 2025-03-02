@@ -8,6 +8,7 @@ import {
   orderReceiveSchema,
   orderCommentsCreateSchema,
 } from "./order.schema";
+import { userSchema } from "./user.schema";
 
 export {
   customerSchema,
@@ -18,4 +19,5 @@ export {
   orderStatusSchema,
   orderReceiveSchema,
   orderCommentsCreateSchema,
+  userSchema,
 };

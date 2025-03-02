@@ -33,6 +33,12 @@ export async function authmiddleware(req: Request, res: Response, next: NextFunc
     const decodedData = jsonwebtoken.verify(token, process.env.SECRET_KEY);
     req["user"] = decodedData;
 
+    // Обновляем срок жизни токена (продлеваем на 24 часа)
+    const now = new Date();
+    const newExpirationDate = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    foundToken.expiresAt = newExpirationDate;
+    await foundToken.save();
+
     next();
   } catch (e: any) {
     console.log(e);

@@ -34,7 +34,7 @@ const cors_options: cors.CorsOptions = {
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
   preflightContinue: false,
   optionsSuccessStatus: 200,
-  exposedHeaders: ["Authorization"],
+  exposedHeaders: ["Authorization", "X-User-Name"],
 };
 
 app.use(cors(cors_options));
@@ -44,7 +44,6 @@ app.use(express.static("static"));
 app.use(fileUpload({}));
 app.use("/api", rebatesRouter);
 app.use("/api", authRouter);
-// app.use(authmiddleware);
 app.use("/api", productsRouter);
 app.use("/api", customerRouter);
 app.use("/api", orderRouter);
