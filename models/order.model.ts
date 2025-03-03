@@ -5,13 +5,13 @@ import { IOrderDocument } from "../data/types";
 const user = new mongoose.Schema(
   {
     _id: { type: String, required: true },
-    username: { type: String, unique: true, required: true },
+    username: { type: String, required: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     roles: [{ type: String, ref: "Role" }],
     createdOn: { type: String, required: true },
   },
-  { versionKey: false }
+  { _id: false, versionKey: false }
 );
 
 const product = new mongoose.Schema(
@@ -58,7 +58,7 @@ const history = new mongoose.Schema(
     action: { type: String, enum: ORDER_HISTORY_ACTIONS, required: true },
     performer: { type: user, required: true },
   },
-  { _id: false }
+  { _id: false, versionKey: false }
 );
 
 const Order = new mongoose.Schema(
@@ -72,7 +72,6 @@ const Order = new mongoose.Schema(
     comments: [{ type: comment, required: false }],
     history: [{ type: history, required: false }],
     assignedManager: { type: user, required: false },
-    //   createdBy: { type: String, required: true },
   },
   { versionKey: false }
 );
