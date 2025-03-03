@@ -1,13 +1,11 @@
 import User from "../models/user.model";
-import Role from "../models/role.model";
 import Token from "../models/token.model";
 import bcrypt from "bcrypt";
-import { validationResult } from "express-validator";
 import jsonwebtoken from "jsonwebtoken";
 import { Request, Response } from "express";
 import { Types } from "mongoose";
 import _ from "lodash";
-import { ROLES, VALIDATION_ERROR_MESSAGES } from "../data/enums";
+import { getTokenFromRequest } from "../utils/utils";
 
 const generateAccessToken = (id: Types.ObjectId, roles: string[]) => {
   const payload = {
@@ -18,45 +16,6 @@ const generateAccessToken = (id: Types.ObjectId, roles: string[]) => {
 };
 
 class AuthController {
-  async registration(req: Request, res: Response) {
-    try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        //TODO: investigate how to fix below code
-        //@ts-ignore
-        const errorMessages = errors.errors.map((el) => el.msg);
-        return res
-          .status(400)
-          .json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY, reason: errorMessages });
-      }
-      const { username, password } = req.body;
-      if (!username || !password) {
-        return res.status(400).json({ IsSuccess: false, ErrorMessage: VALIDATION_ERROR_MESSAGES.BODY });
-      }
-      const candidate = await User.findOne({ username });
-      if (candidate) {
-        return res
-          .status(400)
-          .json({ IsSuccess: false, ErrorMessage: `User with username '${username}' already exists` });
-      }
-      const hashPassword = bcrypt.hashSync(password, 7);
-      const userRole = await Role.findOne({ value: ROLES.USER });
-      const user = new User({ username, password: hashPassword, roles: [userRole.value] });
-      await user.save();
-      return res.status(201).json({
-        IsSuccess: true,
-        ErrorMessage: null,
-        User: {
-          username: user.username,
-          roles: user.roles,
-        },
-      });
-    } catch (e) {
-      console.log(e);
-      res.status(400).json({ IsSuccess: false, ErrorMessage: "Registration error", reason: (e as Error).message });
-    }
-  }
-
   async login(req: Request, res: Response) {
     try {
       const { username, password } = req.body;
@@ -69,22 +28,25 @@ class AuthController {
         return res.status(400).json({ IsSuccess: false, ErrorMessage: "Incorrect credentials" });
       }
 
+      await Token.deleteMany({ expiresAt: { $lt: new Date() } });
+
       const now = new Date();
 
       const existingToken = await Token.findOne({
         userId: user._id,
-        expiresAt: { $gt: now },
+        expiresAt: { $gt: now }, // Проверяем, что токен еще жив
       });
 
       if (existingToken) {
-        return res.header("Authorization", existingToken.token).json({
+        console.log("Returning existing active token");
+        const newExpirationDate = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+        existingToken.expiresAt = newExpirationDate;
+        await existingToken.save();
+        return res.header("Authorization", existingToken.token).header("X-User-Name", user.firstName).json({
           IsSuccess: true,
-          Token: existingToken.token,
           ErrorMessage: null,
         });
       }
-
-      await Token.deleteMany({ expiresAt: { $lt: new Date() } });
 
       const token = generateAccessToken(user._id, user.roles);
       const expirationDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
@@ -93,8 +55,8 @@ class AuthController {
 
       return res
         .header("Authorization", token)
-        .header("X-User-Name", user.username)
-        .json({ IsSuccess: true, ErrorMessage: null });
+        .header("X-User-Name", user.firstName)
+        .json({ IsSuccess: true, ErrorMessage: null, User: _.omit(user.toObject(), ["password"]) });
     } catch (e) {
       console.log(e);
       res.status(400).json({ IsSuccess: false, ErrorMessage: "Login error", reason: (e as Error).message });
@@ -103,7 +65,7 @@ class AuthController {
 
   async logout(req: Request, res: Response) {
     try {
-      const token = req.headers.authorization.split(" ")[1];
+      const token = getTokenFromRequest(req);
 
       // Удаляем только этот конкретный токен
       await Token.deleteOne({ token });
