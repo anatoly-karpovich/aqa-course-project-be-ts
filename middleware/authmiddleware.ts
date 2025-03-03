@@ -1,6 +1,7 @@
 import jsonwebtoken, { TokenExpiredError } from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import Token from "../models/token.model"; // Импорт модели токена
+import { getDataDataFromToken, getTokenFromRequest } from "../utils/utils";
 
 export async function authmiddleware(req: Request, res: Response, next: NextFunction) {
   if (req.method === "OPTIONS") {
@@ -12,7 +13,7 @@ export async function authmiddleware(req: Request, res: Response, next: NextFunc
       return res.status(401).json({ IsSuccess: false, ErrorMessage: "Not authorized" });
     }
 
-    const token = req.headers.authorization.split(" ")[1]; // Bearer <token>
+    const token = getTokenFromRequest(req);
     if (!token) {
       return res.status(401).json({ IsSuccess: false, ErrorMessage: "Not authorized" });
     }
@@ -30,7 +31,7 @@ export async function authmiddleware(req: Request, res: Response, next: NextFunc
     }
 
     // Декодируем токен и сохраняем в `req.user`
-    const decodedData = jsonwebtoken.verify(token, process.env.SECRET_KEY);
+    const decodedData = getDataDataFromToken(token);
     req["user"] = decodedData;
 
     // Обновляем срок жизни токена (продлеваем на 24 часа)

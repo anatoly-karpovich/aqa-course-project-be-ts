@@ -1,6 +1,7 @@
 import { ORDER_HISTORY_ACTIONS, ORDER_STATUSES } from "../enums";
 import * as mongoose from "mongoose";
 import type { ICustomer, IProduct, IDelivery, DocumentResult, IComment } from ".";
+import { IUserWithRoles } from "./users.types";
 
 export interface IOrder<CustomerType> {
   readonly _id?: mongoose.Types.ObjectId;
@@ -16,6 +17,7 @@ export interface IOrder<CustomerType> {
   createdOn: string;
   history: IHistory[];
   comments: IComment[];
+  assignedManager: IUserWithRoles | null;
 }
 
 export interface IProductInOrder extends IProduct {
@@ -42,4 +44,5 @@ export interface IHistory {
   readonly delivery: IDelivery | null;
   readonly total_price: number;
   readonly changedOn: string;
+  readonly performer: IUserWithRoles;
 }

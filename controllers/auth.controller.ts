@@ -5,6 +5,7 @@ import jsonwebtoken from "jsonwebtoken";
 import { Request, Response } from "express";
 import { Types } from "mongoose";
 import _ from "lodash";
+import { getTokenFromRequest } from "../utils/utils";
 
 const generateAccessToken = (id: Types.ObjectId, roles: string[]) => {
   const payload = {
@@ -55,7 +56,7 @@ class AuthController {
       return res
         .header("Authorization", token)
         .header("X-User-Name", user.firstName)
-        .json({ IsSuccess: true, ErrorMessage: null });
+        .json({ IsSuccess: true, ErrorMessage: null, User: _.omit(user.toObject(), ["password"]) });
     } catch (e) {
       console.log(e);
       res.status(400).json({ IsSuccess: false, ErrorMessage: "Login error", reason: (e as Error).message });
@@ -64,7 +65,7 @@ class AuthController {
 
   async logout(req: Request, res: Response) {
     try {
-      const token = req.headers.authorization.split(" ")[1];
+      const token = getTokenFromRequest(req);
 
       // Удаляем только этот конкретный токен
       await Token.deleteOne({ token });

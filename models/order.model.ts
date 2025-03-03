@@ -2,6 +2,18 @@ import mongoose from "mongoose";
 import { DELIVERY, ORDER_HISTORY_ACTIONS } from "../data/enums";
 import { IOrderDocument } from "../data/types";
 
+const user = new mongoose.Schema(
+  {
+    _id: { type: String, required: true },
+    username: { type: String, unique: true, required: true },
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    roles: [{ type: String, ref: "Role" }],
+    createdOn: { type: String, required: true },
+  },
+  { versionKey: false }
+);
+
 const product = new mongoose.Schema(
   {
     _id: { type: mongoose.SchemaTypes.ObjectId },
@@ -10,7 +22,7 @@ const product = new mongoose.Schema(
     price: { type: Number, required: true },
     manufacturer: { type: String, required: true },
     notes: { type: String, required: false },
-    received: {type: Boolean, required: true }
+    received: { type: Boolean, required: true },
   },
   { _id: false }
 );
@@ -31,9 +43,9 @@ const delivery = new mongoose.Schema(
 );
 
 const comment = new mongoose.Schema({
-  text: { type: String, required: true},
-  createdOn: { type: Date, required: true},
-})
+  text: { type: String, required: true },
+  createdOn: { type: Date, required: true },
+});
 
 const history = new mongoose.Schema(
   {
@@ -43,21 +55,26 @@ const history = new mongoose.Schema(
     total_price: { type: Number, require: true },
     delivery: { type: delivery, required: false },
     changedOn: { type: Date, required: true },
-    action: { type: String, enum: ORDER_HISTORY_ACTIONS, required: true}
+    action: { type: String, enum: ORDER_HISTORY_ACTIONS, required: true },
+    performer: { type: user, required: true },
   },
   { _id: false }
 );
 
-const Order = new mongoose.Schema({
-  status: { type: String, required: true },
-  customer: { type: mongoose.SchemaTypes.ObjectId, ref: "Customer", required: true },
-  products: [{ type: product, required: true }],
-  delivery: { type: delivery, required: false },
-  total_price: { type: Number, require: true },
-  createdOn: { type: Date, required: true },
-  comments: [{ type: comment, required: false }],
-  history: [{ type: history, required: false }],
-  //   createdBy: { type: String, required: true },
-}, { versionKey: false });
+const Order = new mongoose.Schema(
+  {
+    status: { type: String, required: true },
+    customer: { type: mongoose.SchemaTypes.ObjectId, ref: "Customer", required: true },
+    products: [{ type: product, required: true }],
+    delivery: { type: delivery, required: false },
+    total_price: { type: Number, require: true },
+    createdOn: { type: Date, required: true },
+    comments: [{ type: comment, required: false }],
+    history: [{ type: history, required: false }],
+    assignedManager: { type: user, required: false },
+    //   createdBy: { type: String, required: true },
+  },
+  { versionKey: false }
+);
 
 export default mongoose.model<IOrderDocument>("Order", Order);

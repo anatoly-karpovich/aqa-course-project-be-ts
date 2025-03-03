@@ -6,10 +6,12 @@ import { getTotalPrice, createHistoryEntry, productsMapping, getTodaysDate, cust
 import { ORDER_HISTORY_ACTIONS, ORDER_STATUSES } from "../data/enums";
 import _ from "lodash";
 import mongoose from "mongoose";
+import usersService from "./users.service";
 
 class OrderService {
-  async create(order: IOrderRequest): Promise<IOrder<ICustomer>> {
+  async create(order: IOrderRequest, performerdId: string): Promise<IOrder<ICustomer>> {
     const products = await productsMapping(order);
+    const assignedManager = await usersService.getUser(performerdId);
     let action = ORDER_HISTORY_ACTIONS.CREATED;
     const newOrder: IOrder<string> = {
       status: ORDER_STATUSES.DRAFT,
@@ -20,11 +22,13 @@ class OrderService {
       createdOn: getTodaysDate(true),
       history: [],
       comments: [],
+      assignedManager,
     };
-    newOrder.history.unshift(createHistoryEntry(newOrder, action));
+    newOrder.history.unshift(createHistoryEntry(newOrder, action, assignedManager));
     const createdOrder = await Order.create(newOrder);
     const customer = await CustomerService.getCustomer(createdOrder.customer);
-    return { ...createdOrder._doc, customer };
+
+    return { ...createdOrder._doc, customer, assignedManager };
   }
 
   async getAll(): Promise<IOrder<ICustomer>[]> {
@@ -86,12 +90,15 @@ class OrderService {
       return undefined;
     }
     const customer = await CustomerService.getCustomer(orderFromDB.customer);
-    return { ...orderFromDB._doc, customer };
+    const assignedManager = await usersService.getUser(orderFromDB.assignedManager as unknown as string);
+    console.log(assignedManager);
+    return { ...orderFromDB._doc, customer, assignedManager };
   }
 
-  async update(orderId: Types.ObjectId, order: IOrderRequest): Promise<IOrder<ICustomer>> {
+  async update(orderId: Types.ObjectId, order: IOrderRequest, performerId: string): Promise<IOrder<ICustomer>> {
     const products = await productsMapping(order);
     const orderFromDb = await this.getOrder(orderId);
+    const manager = await usersService.getUser(performerId);
     const newOrder: IOrder<string> = {
       status: ORDER_STATUSES.DRAFT,
       customer: order.customer.toString(),
@@ -101,6 +108,7 @@ class OrderService {
       history: orderFromDb.history,
       createdOn: orderFromDb.createdOn,
       comments: orderFromDb.comments,
+      assignedManager: orderFromDb.assignedManager,
     };
     if (
       !_.isEqual(
@@ -110,12 +118,12 @@ class OrderService {
     ) {
       const o = _.cloneDeep(newOrder);
       o.customer = orderFromDb.customer._id.toString();
-      newOrder.history.unshift(createHistoryEntry(o, ORDER_HISTORY_ACTIONS.REQUIRED_PRODUCTS_CHANGED));
+      newOrder.history.unshift(createHistoryEntry(o, ORDER_HISTORY_ACTIONS.REQUIRED_PRODUCTS_CHANGED, manager));
     }
     if (!_.isEqual(order.customer.toString(), orderFromDb.customer._id.toString())) {
       const o = _.cloneDeep(newOrder);
       o.products = [...orderFromDb.products];
-      newOrder.history.unshift(createHistoryEntry(o, ORDER_HISTORY_ACTIONS.CUSTOMER_CHANGED));
+      newOrder.history.unshift(createHistoryEntry(o, ORDER_HISTORY_ACTIONS.CUSTOMER_CHANGED, manager));
     }
     const updatedOrder = await Order.findByIdAndUpdate(orderId, newOrder, { new: true });
     const customer = await CustomerService.getCustomer(updatedOrder.customer);

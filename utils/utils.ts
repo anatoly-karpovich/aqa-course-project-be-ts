@@ -1,9 +1,12 @@
 import moment from "moment";
 import { DATE_AND_TIME_FORMAT, DATE_FORMAT } from "../data/constants";
-import { ORDER_HISTORY_ACTIONS } from "../data/enums";
+import { ORDER_HISTORY_ACTIONS, ROLES } from "../data/enums";
 import type { ICustomer, IHistory, IOrder, IOrderRequest, IProduct } from "../data/types";
 import { IProductInOrder } from "../data/types/order.type";
 import ProductsService from "../services/products.service";
+import { Request } from "express";
+import jsonwebtoken from "jsonwebtoken";
+import { IUserWithRoles } from "../data/types/users.types";
 
 export const getTotalPrice = (products: IProduct[]) => {
   return products.reduce((a, b) => {
@@ -16,9 +19,10 @@ export const getTodaysDate = (withTime: boolean) => {
   return withTime ? moment(Date.now()).format(DATE_AND_TIME_FORMAT) : moment(Date.now()).format(DATE_FORMAT);
 };
 
-export function createHistoryEntry<T extends Omit<IHistory, "changedOn" | "action">>(
+export function createHistoryEntry<T extends Omit<IHistory, "changedOn" | "action" | "performer">>(
   order: T,
-  action: ORDER_HISTORY_ACTIONS
+  action: ORDER_HISTORY_ACTIONS,
+  performer: IUserWithRoles
 ): IHistory {
   return {
     action,
@@ -28,6 +32,7 @@ export function createHistoryEntry<T extends Omit<IHistory, "changedOn" | "actio
     delivery: order.delivery,
     total_price: order.total_price,
     changedOn: getTodaysDate(true),
+    performer,
   };
 }
 
@@ -78,4 +83,19 @@ export function customSort<T extends IProduct | ICustomer | IOrder<ICustomer>>(
 
     return (createdOnA - createdOnB) * direction;
   });
+}
+
+export function getTokenFromRequest(req: Request) {
+  const token = req.headers.authorization?.split(" ")[1];
+  return token;
+}
+
+export function getDataDataFromToken(token: string) {
+  const decodedData = jsonwebtoken.verify(token, process.env.SECRET_KEY);
+  return decodedData as {
+    id: string;
+    roles: ROLES[];
+    iat: number;
+    exp: number;
+  };
 }

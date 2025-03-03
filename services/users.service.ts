@@ -25,7 +25,12 @@ class UsersService {
 
   async getUser(id: string) {
     const user = await User.findById(id);
-    return _.omit(user.toObject(), ["password"]);
+    return user ? _.omit(user.toObject(), ["password"]) : null;
+  }
+
+  async getUserByUsername(username: string) {
+    const user = await User.findOne({ username });
+    return user ? _.omit(user.toObject(), ["password"]) : null;
   }
 
   async getUsers() {
@@ -34,6 +39,11 @@ class UsersService {
     });
 
     return users;
+  }
+
+  async getUserName(id: string) {
+    const manager = await User.findById(id);
+    return `${manager.firstName} ${manager.lastName}`;
   }
 }
 

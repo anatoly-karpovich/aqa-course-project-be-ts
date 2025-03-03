@@ -1,11 +1,14 @@
 import OrderService from "../services/order.service.js";
 import { Request, Response } from "express";
 import mongoose from "mongoose";
+import { getDataDataFromToken, getTokenFromRequest } from "../utils/utils.js";
 
 class OrderController {
   async create(req: Request, res: Response) {
     try {
-      const order = await OrderService.create(req.body);
+      const token = getTokenFromRequest(req);
+      const userData = getDataDataFromToken(token);
+      const order = await OrderService.create(req.body, userData.id);
       res.status(201).json({ Order: order, IsSuccess: true, ErrorMessage: null });
     } catch (e: any) {
       console.log(e);
@@ -48,8 +51,10 @@ class OrderController {
 
   async update(req: Request, res: Response) {
     try {
+      const token = getTokenFromRequest(req);
+      const userData = getDataDataFromToken(token);
       const orderId = new mongoose.Types.ObjectId(req.params.id);
-      const updatedOrder = await OrderService.update(orderId, req.body);
+      const updatedOrder = await OrderService.update(orderId, req.body, userData.id);
       return res.status(200).json({ Order: updatedOrder, IsSuccess: true, ErrorMessage: null });
     } catch (e: any) {
       console.log(e);

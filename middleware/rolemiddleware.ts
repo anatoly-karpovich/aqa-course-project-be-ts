@@ -1,6 +1,7 @@
 import jsonwebtoken from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import { ROLES } from "../data/enums.js";
+import { getDataDataFromToken, getTokenFromRequest } from "../utils/utils.js";
 
 export const roleMiddleware = (roles: ROLES) => {
   return function (req: Request, res: Response, next: NextFunction) {
@@ -9,11 +10,11 @@ export const roleMiddleware = (roles: ROLES) => {
     }
 
     try {
-      const token = req.headers.authorization.split(" ")[1];
+      const token = getTokenFromRequest(req);
       if (!token) {
         return res.status(401).json({ IsSuccess: false, ErrorMessage: "Not authorized" });
       }
-      const { roles: userRoles } = jsonwebtoken.verify(token, process.env.SECRET_KEY) as jsonwebtoken.JwtPayload;
+      const { roles: userRoles } = getDataDataFromToken(token) as jsonwebtoken.JwtPayload;
       let hashrole = false;
       userRoles.forEach((role) => {
         if (roles.includes(role)) {
