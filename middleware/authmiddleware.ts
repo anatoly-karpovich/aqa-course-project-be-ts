@@ -24,15 +24,15 @@ export async function authmiddleware(req: Request, res: Response, next: NextFunc
       return res.status(401).json({ IsSuccess: false, ErrorMessage: "Invalid access token" });
     }
 
-    // Проверяем срок действия токена
-    if (new Date() > foundToken.expiresAt) {
+    // Декодируем токен и сохраняем в `req.user`
+    let decodedData: ReturnType<typeof getDataDataFromToken>;
+    try {
+      decodedData = getDataDataFromToken(token);
+      req["user"] = decodedData;
+    } catch (e) {
       await Token.deleteOne({ token }); // Удаляем истекший токен
       return res.status(401).json({ IsSuccess: false, ErrorMessage: "Access token expired" });
     }
-
-    // Декодируем токен и сохраняем в `req.user`
-    const decodedData = getDataDataFromToken(token);
-    req["user"] = decodedData;
 
     // Обновляем срок жизни токена (продлеваем на 24 часа)
     const now = new Date();
