@@ -42,10 +42,14 @@ class AuthController {
         const newExpirationDate = new Date(now.getTime() + 24 * 60 * 60 * 1000);
         existingToken.expiresAt = newExpirationDate;
         await existingToken.save();
-        return res.header("Authorization", existingToken.token).header("X-User-Name", user.firstName).json({
-          IsSuccess: true,
-          ErrorMessage: null,
-        });
+        return res
+          .header("Authorization", existingToken.token)
+          .header("X-User-Name", user.firstName)
+          .json({
+            IsSuccess: true,
+            ErrorMessage: null,
+            User: _.omit(user.toObject(), ["password"]),
+          });
       }
 
       const token = generateAccessToken(user._id, user.roles);
