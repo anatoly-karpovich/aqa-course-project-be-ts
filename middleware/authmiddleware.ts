@@ -1,4 +1,4 @@
-import jsonwebtoken, { TokenExpiredError } from "jsonwebtoken";
+import { TokenExpiredError } from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import Token from "../models/token.model"; // Импорт модели токена
 import { getDataDataFromToken, getTokenFromRequest } from "../utils/utils";

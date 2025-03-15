@@ -45,6 +45,17 @@ class UsersService {
     const manager = await User.findById(id);
     return `${manager.firstName} ${manager.lastName}`;
   }
+
+  async updatePassword(userId: string, oldPassword: string, newPassword: string) {
+    const user = await User.findById(userId);
+
+    const hashPassword = bcrypt.hashSync(newPassword, 7);
+
+    user.password = hashPassword;
+    await user.save();
+
+    return await this.getUser(userId);
+  }
 }
 
 export default new UsersService();

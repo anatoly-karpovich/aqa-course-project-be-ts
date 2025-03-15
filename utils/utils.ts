@@ -99,3 +99,8 @@ export function getDataDataFromToken(token: string) {
     exp: number;
   };
 }
+
+export function getUserFromRequest(req: Request) {
+  const token = getTokenFromRequest(req);
+  return getDataDataFromToken(token);
+}

@@ -1,11 +1,13 @@
-import { ROLES, VALIDATION_ERROR_MESSAGES } from "../data/enums";
+import { VALIDATION_ERROR_MESSAGES } from "../data/enums";
 import { Request, Response } from "express";
 import User from "../models/user.model";
-import Role from "../models/role.model";
-import bcrypt from "bcrypt";
 import { validationResult } from "express-validator";
 import _ from "lodash";
 import UsersService from "../services/users.service";
+import orderService from "../services/order.service";
+import { getUserFromRequest } from "../utils/utils";
+import Token from "../models/token.model";
+import mongoose from "mongoose";
 
 class UsersController {
   async registration(req: Request, res: Response) {
@@ -59,8 +61,8 @@ class UsersController {
       if (!id) {
         throw new Error("Id was not provided");
       }
-      const user = await UsersService.getUser(id);
-      res.json({ User: user, IsSuccess: true, ErrorMessage: null });
+      const [user, orders] = await Promise.all([UsersService.getUser(id), orderService.getOrdersByManager(id)]);
+      res.json({ User: user, Orders: orders, IsSuccess: true, ErrorMessage: null });
     } catch (e) {
       console.log(e);
       res
@@ -75,12 +77,29 @@ class UsersController {
       if (!id) {
         throw new Error("Id was not provided");
       }
-
+      const performer = getUserFromRequest(req);
       const deletedUser = await UsersService.delete(id);
+      if (performer.id === deletedUser._id.toString()) {
+        await Token.deleteMany({ "token._id": new mongoose.Types.ObjectId(performer.id) });
+      }
       res.status(204).json({ IsSuccess: true, ErrorMessage: null, User: deletedUser });
     } catch (e) {
       console.log(e);
       res.status(400).json({ IsSuccess: false, ErrorMessage: "Failed to delete user", reason: (e as Error).message });
+    }
+  }
+
+  async changePassword(req: Request, res: Response) {
+    try {
+      const userId = req.params.id;
+      const { oldPassword, newPassword } = req.body;
+
+      const updatedUser = await UsersService.updatePassword(userId, oldPassword, newPassword);
+
+      return res.status(200).json({ IsSuccess: true, ErrorMessage: null, User: updatedUser });
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: "Failed to update password." });
     }
   }
 }

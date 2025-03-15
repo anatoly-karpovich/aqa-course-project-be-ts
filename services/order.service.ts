@@ -91,7 +91,6 @@ class OrderService {
     }
     const customer = await CustomerService.getCustomer(orderFromDB.customer);
     const assignedManager = await usersService.getUser(orderFromDB.assignedManager as unknown as string);
-    console.log(assignedManager);
     return { ...orderFromDB._doc, customer, assignedManager };
   }
 
@@ -146,6 +145,20 @@ class OrderService {
 
     // Assuming that the `customer` field in the order contains the customer's ID
     const orders = await Order.find({ customer: customerId });
+
+    return orders;
+  }
+
+  async getOrdersByManager(managerId: string) {
+    if (!managerId) {
+      throw new Error("Manager ID was not provided");
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(managerId)) {
+      throw new Error("Invalid Manager ID format");
+    }
+
+    const orders = await Order.find({ "assignedManager._id": new mongoose.Types.ObjectId(managerId) });
 
     return orders;
   }
