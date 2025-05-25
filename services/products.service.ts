@@ -12,14 +12,18 @@ class ProductsService {
 
   async getSorted(
     filters: IProductFilters,
-    sortOptions: { sortField: string; sortOrder: string }
-  ): Promise<IProduct[]> {
+    sortOptions: { sortField: string; sortOrder: string },
+    pagination: { skip: number; limit: number }
+  ): Promise<{ products: IProduct[]; total: number }> {
     const { manufacturers, search } = filters;
-    let filter: Record<string, any> = {};
+    const { skip, limit } = pagination;
+
+    const filter: Record<string, any> = {};
 
     if (manufacturers && manufacturers.length > 0) {
       filter.manufacturer = { $in: manufacturers };
     }
+
     if (search && search.trim() !== "") {
       const searchRegex = new RegExp(search, "i");
       const searchNumber = parseFloat(search);
@@ -35,9 +39,13 @@ class ProductsService {
       }
     }
 
-    const products = await Product.find(filter).exec();
+    const all = await Product.find(filter).exec();
+    const total = all.length;
 
-    return customSort(products, sortOptions);
+    const sorted = customSort(all, sortOptions);
+    const paginated = sorted.slice(skip, skip + limit);
+
+    return { products: paginated, total };
   }
 
   async getAll() {

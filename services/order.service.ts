@@ -44,15 +44,18 @@ class OrderService {
 
   async getSorted(
     filters: { search?: string; status?: string[] },
-    sortOptions: { sortField: string; sortOrder: string }
-  ): Promise<IOrder<ICustomer>[]> {
+    sortOptions: { sortField: string; sortOrder: string },
+    pagination: { skip: number; limit: number }
+  ): Promise<{ orders: IOrder<ICustomer>[]; total: number }> {
     const { search = "", status = [] } = filters;
+    const { skip, limit } = pagination;
 
     let ordersFromDB = await Order.find().exec();
 
+    // Джойним кастомеров
     let orders = await Promise.all(
       ordersFromDB.map(async (order) => {
-        const customer = await CustomerService.getCustomer(order.customer); // Подгружаем клиента по его ID
+        const customer = await CustomerService.getCustomer(order.customer);
         return {
           ...order._doc,
           customer,
@@ -60,7 +63,8 @@ class OrderService {
       })
     );
 
-    if (search && search.trim() !== "") {
+    // Фильтрация
+    if (search.trim() !== "") {
       const searchRegex = new RegExp(search, "i");
       const searchNumber = parseFloat(search);
 
@@ -78,7 +82,11 @@ class OrderService {
       orders = orders.filter((order) => status.includes(order.status));
     }
 
-    return customSort(orders, sortOptions);
+    const total = orders.length;
+    const sorted = customSort(orders, sortOptions);
+    const paginated = sorted.slice(skip, skip + limit);
+
+    return { orders: paginated, total };
   }
 
   async getOrder(id: Types.ObjectId): Promise<IOrder<ICustomer>> {

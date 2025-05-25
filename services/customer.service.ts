@@ -16,16 +16,19 @@ class CustomerService {
 
   async getSorted(
     filters: { search: string; country: string[] },
-    sortOptions: { sortField: string; sortOrder: string }
-  ): Promise<ICustomer[]> {
+    sortOptions: { sortField: string; sortOrder: string },
+    pagination: { skip: number; limit: number }
+  ): Promise<{ customers: ICustomer[]; total: number }> {
     const { search, country } = filters;
-    let filter: Record<string, any> = {};
+    const { skip, limit } = pagination;
+
+    const filter: Record<string, any> = {};
 
     if (country.length > 0) {
       filter.country = { $in: country };
     }
-    const searchRegex = new RegExp(search, "i");
 
+    const searchRegex = new RegExp(search, "i");
     if (search && search.trim() !== "") {
       filter.$or = [
         { email: { $regex: searchRegex } },
@@ -34,8 +37,13 @@ class CustomerService {
       ];
     }
 
-    const customers = await Customer.find(filter).exec();
-    return customSort(customers, sortOptions);
+    const all = await Customer.find(filter).exec(); // без сортировки и лимита
+    const total = all.length;
+
+    const sorted = customSort(all, sortOptions);
+    const paginated = sorted.slice(skip, skip + limit);
+
+    return { customers: paginated, total };
   }
 
   async getCustomer(id: Types.ObjectId): Promise<ICustomer> {

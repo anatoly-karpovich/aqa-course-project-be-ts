@@ -3,6 +3,9 @@ import { Request, Response } from "express";
 import mongoose from "mongoose";
 import { getDataDataFromToken, getTokenFromRequest } from "../utils/utils.js";
 
+const MIN_LIMIT = 10;
+const MAX_LIMIT = 100;
+
 class OrderController {
   async create(req: Request, res: Response) {
     try {
@@ -22,16 +25,34 @@ class OrderController {
         search = "",
         sortField = "createdOn",
         sortOrder = "asc",
+        page = "1",
+        limit = MIN_LIMIT,
       } = req.query as Record<string, string | undefined>;
+
+      const pageNumber = Math.max(parseInt(page), 1);
+      const limitNumber = Math.min(Math.max(+limit, MIN_LIMIT), MAX_LIMIT);
+      const skip = (pageNumber - 1) * limitNumber;
 
       const statuses = (
         Array.isArray(req.query.status) ? req.query.status : req.query.status ? [req.query.status] : []
       ) as string[];
 
-      const orders = await OrderService.getSorted({ search, status: statuses }, { sortField, sortOrder });
-      return res
-        .status(200)
-        .json({ Orders: orders, sorting: { sortField, sortOrder }, IsSuccess: true, ErrorMessage: null });
+      const filters = { search, status: statuses };
+      const sortOptions = { sortField, sortOrder };
+
+      const { orders, total } = await OrderService.getSorted(filters, sortOptions, { skip, limit: limitNumber });
+
+      return res.status(200).json({
+        Orders: orders,
+        total,
+        page: pageNumber,
+        limit: limitNumber,
+        search,
+        status: statuses,
+        sorting: sortOptions,
+        IsSuccess: true,
+        ErrorMessage: null,
+      });
     } catch (e: any) {
       console.log(e);
       return res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });

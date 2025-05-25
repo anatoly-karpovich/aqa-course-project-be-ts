@@ -2,6 +2,9 @@ import CustomerService from "../services/customer.service";
 import { Request, Response } from "express";
 import mongoose from "mongoose";
 
+const MIN_LIMIT = 10;
+const MAX_LIMIT = 100;
+
 class CustomerController {
   async create(req: Request, res: Response) {
     try {
@@ -19,12 +22,34 @@ class CustomerController {
         sortField = "createdOn",
         sortOrder = "desc",
         country,
+        page = "1",
+        limit = MIN_LIMIT,
       } = req.query as Record<string, string | undefined>;
 
       const countries = (Array.isArray(country) ? country : country ? [country] : []) as string[];
 
-      const customers = await CustomerService.getSorted({ search, country: countries }, { sortField, sortOrder });
-      return res.json({ Customers: customers, sorting: { sortField, sortOrder }, IsSuccess: true, ErrorMessage: null });
+      const pageNumber = Math.max(parseInt(page), 1);
+
+      const limitNumber = Math.min(Math.max(+limit, MIN_LIMIT), MAX_LIMIT);
+      const skip = (pageNumber - 1) * limitNumber;
+
+      const { customers, total } = await CustomerService.getSorted(
+        { search, country: countries },
+        { sortField, sortOrder },
+        { skip, limit: limitNumber }
+      );
+
+      return res.json({
+        Customers: customers,
+        total,
+        page: pageNumber,
+        limit: limitNumber,
+        search,
+        country: countries,
+        sorting: { sortField, sortOrder },
+        IsSuccess: true,
+        ErrorMessage: null,
+      });
     } catch (e: any) {
       return res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
     }
