@@ -5,10 +5,12 @@ import _ from "lodash";
 import type { IOrder, ICustomer } from "../data/types";
 import { createHistoryEntry } from "../utils/utils";
 import { Types } from "mongoose";
-import { ORDER_HISTORY_ACTIONS, ORDER_STATUSES } from "../data/enums";
+import { NOTIFICATIONS, ORDER_HISTORY_ACTIONS, ORDER_STATUSES } from "../data/enums";
 import usersService from "./users.service";
+import { NotificationService } from "./notification.service";
 
 class OrderStatusService {
+  private notificationService = new NotificationService();
   async updateStatus(orderId: Types.ObjectId, status: string, performerId: string): Promise<IOrder<ICustomer>> {
     if (!orderId) {
       throw new Error("Id was not provided");
@@ -27,6 +29,14 @@ class OrderStatusService {
     newOrder.history.unshift(createHistoryEntry(newOrder, action, manager));
     const updatedOrder = await Order.findByIdAndUpdate(newOrder._id, newOrder, { new: true });
     const customer = await CustomerService.getCustomer(updatedOrder.customer);
+    if (updatedOrder.assignedManager) {
+      await this.notificationService.create({
+        userId: updatedOrder.assignedManager._id.toString(),
+        orderId: updatedOrder._id.toString(),
+        type: "statusChanged",
+        message: NOTIFICATIONS.statusChanged(updatedOrder.status),
+      });
+    }
     return { ...updatedOrder._doc, customer };
   }
 }

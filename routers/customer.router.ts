@@ -255,8 +255,40 @@ customerRouter.post(
  *       500:
  *         description: Server error
  */
-customerRouter.get("/customers", authmiddleware, CustomerController.getAll);
+customerRouter.get("/customers", authmiddleware, CustomerController.getAllSorted);
 
+/**
+ * @swagger
+ * /api/customers/all:
+ *   get:
+ *     summary: Get the list of all customers (no pagination, filters or sorting)
+ *     tags: [Customers]
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: Bearer <JWT token>
+ *         description: Bearer token for authentication
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: The complete list of customers
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Customer'
+ *       401:
+ *         description: Unauthorized, missing or invalid token
+ *       500:
+ *         description: Server error
+ */
+
+customerRouter.get("/customers/all", authmiddleware, CustomerController.getAll);
 /**
  * @swagger
  * /api/customers/{id}:
