@@ -147,7 +147,40 @@ const productsRouter = Router();
  *         description: Server error
  */
 
-productsRouter.get("/products", authmiddleware, ProductsController.getAll);
+productsRouter.get("/products", authmiddleware, ProductsController.getAllSorted);
+
+/**
+ * @swagger
+ * /api/products/all:
+ *   get:
+ *     summary: Get the list of all products (no pagination, filters or sorting)
+ *     tags: [Products]
+ *     parameters:
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: Bearer <JWT token>
+ *         description: Bearer token for authentication
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: The complete list of products
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Product'
+ *       401:
+ *         description: Unauthorized, missing or invalid token
+ *       500:
+ *         description: Server error
+ */
+
+productsRouter.get("/products/all", authmiddleware, ProductsController.getAll);
 
 /**
  * @swagger

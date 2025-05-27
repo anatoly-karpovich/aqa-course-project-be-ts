@@ -3,12 +3,15 @@ import CustomerService from "./customer.service";
 import { IOrder, IOrderRequest, ICustomer } from "../data/types";
 import type { Types } from "mongoose";
 import { getTotalPrice, createHistoryEntry, productsMapping, getTodaysDate, customSort } from "../utils/utils";
-import { ORDER_HISTORY_ACTIONS, ORDER_STATUSES } from "../data/enums";
+import { NOTIFICATIONS, ORDER_HISTORY_ACTIONS, ORDER_STATUSES } from "../data/enums";
 import _ from "lodash";
 import mongoose from "mongoose";
 import usersService from "./users.service";
+import { NotificationService } from "./notification.service";
 
 class OrderService {
+  private notificationService = new NotificationService();
+
   async create(order: IOrderRequest, performerdId: string): Promise<IOrder<ICustomer>> {
     const products = await productsMapping(order);
     const assignedManager = await usersService.getUser(performerdId);
@@ -117,23 +120,48 @@ class OrderService {
       comments: orderFromDb.comments,
       assignedManager: orderFromDb.assignedManager,
     };
+    let changed = {
+      products: false,
+      customer: false,
+    };
     if (
       !_.isEqual(
         order.products,
         orderFromDb.products.map((p) => p._id.toString())
       )
     ) {
+      changed.products = true;
       const o = _.cloneDeep(newOrder);
       o.customer = orderFromDb.customer._id.toString();
       newOrder.history.unshift(createHistoryEntry(o, ORDER_HISTORY_ACTIONS.REQUIRED_PRODUCTS_CHANGED, manager));
     }
     if (!_.isEqual(order.customer.toString(), orderFromDb.customer._id.toString())) {
+      changed.customer = true;
       const o = _.cloneDeep(newOrder);
       o.products = [...orderFromDb.products];
       newOrder.history.unshift(createHistoryEntry(o, ORDER_HISTORY_ACTIONS.CUSTOMER_CHANGED, manager));
     }
     const updatedOrder = await Order.findByIdAndUpdate(orderId, newOrder, { new: true });
     const customer = await CustomerService.getCustomer(updatedOrder.customer);
+
+    if (updatedOrder.assignedManager) {
+      if (changed.products) {
+        await this.notificationService.create({
+          userId: updatedOrder.assignedManager._id.toString(),
+          orderId: updatedOrder._id.toString(),
+          type: "productsChanged",
+          message: NOTIFICATIONS.productsChanged,
+        });
+      }
+      if (changed.customer) {
+        await this.notificationService.create({
+          userId: updatedOrder.assignedManager._id.toString(),
+          orderId: updatedOrder._id.toString(),
+          type: "customerChanged",
+          message: NOTIFICATIONS.customerChanged,
+        });
+      }
+    }
     return { ...updatedOrder._doc, customer };
   }
 

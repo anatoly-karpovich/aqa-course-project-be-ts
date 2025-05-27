@@ -5,10 +5,13 @@ import type { IOrder, ICustomer, IDelivery } from "../data/types";
 import OrderService from "./order.service";
 import { createHistoryEntry } from "../utils/utils";
 import { Types } from "mongoose";
-import { ORDER_HISTORY_ACTIONS } from "../data/enums";
+import { NOTIFICATIONS, ORDER_HISTORY_ACTIONS } from "../data/enums";
 import usersService from "./users.service";
+import { NotificationService } from "./notification.service";
 
 class OrderDeliveryService {
+  private notificationService = new NotificationService();
+
   async updateDelivery(orderId: Types.ObjectId, delivery: IDelivery, performerId: string): Promise<IOrder<ICustomer>> {
     if (!orderId) {
       throw new Error("Id was not provided");
@@ -28,7 +31,14 @@ class OrderDeliveryService {
     newOrder.history.unshift(createHistoryEntry(newOrder, action, manager));
     const updatedOrder = await Order.findByIdAndUpdate(newOrder._id, newOrder, { new: true });
     const customer = await CustomerService.getCustomer(updatedOrder.customer);
-
+    if (updatedOrder.assignedManager) {
+      await this.notificationService.create({
+        userId: updatedOrder.assignedManager._id.toString(),
+        orderId: updatedOrder._id.toString(),
+        type: "deliveryUpdated",
+        message: NOTIFICATIONS.deliveryUpdated,
+      });
+    }
     return { ...updatedOrder._doc, customer };
   }
 }

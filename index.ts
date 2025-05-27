@@ -17,6 +17,8 @@ import rebatesRouter from "./routers/rebates.router";
 import customerOrdersRouter from "./routers/customer.orders.router";
 import metricsRouter from "./routers/metrics.router";
 import usersRouter from "./routers/users.router";
+import notificationRouter from "./routers/notification.router";
+import { startNotificationCleanup } from "./utils/cron";
 
 dotenv.config();
 
@@ -54,6 +56,7 @@ app.use("/api", orderCommentsRouter);
 app.use("/api", customerOrdersRouter);
 app.use("/api", metricsRouter);
 app.use("/api", usersRouter);
+app.use("/api", notificationRouter);
 app.use(errorHandleMiddleware);
 
 async function startApp() {
@@ -67,4 +70,7 @@ async function startApp() {
     console.log(e);
   }
 }
+
+startNotificationCleanup();
+
 startApp();

@@ -15,7 +15,7 @@ class CustomerController {
     }
   }
 
-  async getAll(req: Request, res: Response): Promise<Response> {
+  async getAllSorted(req: Request, res: Response): Promise<Response> {
     try {
       const {
         search = "",
@@ -52,6 +52,15 @@ class CustomerController {
       });
     } catch (e: any) {
       return res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
+    }
+  }
+
+  async getAll(req: Request, res: Response) {
+    try {
+      const customers = await CustomerService.getAll();
+      return res.json({ Customers: customers, IsSuccess: true, ErrorMessage: null });
+    } catch (e: any) {
+      res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
     }
   }
 

@@ -16,7 +16,7 @@ class ProductsController {
     }
   }
 
-  async getAll(req: Request, res: Response): Promise<Response> {
+  async getAllSorted(req: Request, res: Response): Promise<Response> {
     try {
       const {
         search = "",
@@ -72,6 +72,15 @@ class ProductsController {
       const id = new mongoose.Types.ObjectId(req.params.id);
       const product = await ProductsService.getProduct(id);
       return res.json({ Product: product, IsSuccess: true, ErrorMessage: null });
+    } catch (e: any) {
+      res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
+    }
+  }
+
+  async getAll(req: Request, res: Response) {
+    try {
+      const products = await ProductsService.getAll();
+      return res.json({ Products: products, IsSuccess: true, ErrorMessage: null });
     } catch (e: any) {
       res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
     }
