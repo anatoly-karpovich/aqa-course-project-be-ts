@@ -71,26 +71,20 @@ export enum ORDER_HISTORY_ACTIONS {
   RECEIVED = "Received",
   RECEIVED_ALL = "All products received",
   CANCELED = "Order canceled",
+  MANAGER_ASSIGNED = "Manager Assigned",
+  MANAGER_UNASSIGNED = "Manager Unassigned",
 }
 
 export const NOTIFICATIONS = {
-  assigned: (orderId: string) => `You have been assigned to Order #${orderId}.`,
-
   statusChanged: (status: ORDER_STATUSES) => `Status has been updated to "${status}" in order.`,
-
   customerChanged: `Customer has been changed in order.`,
-
   productsChanged: `Products have been updated in order.`,
-
   deliveryUpdated: `Delivery details have been added or updated in order.`,
-
   productsDelivered: `Products have been marked as delivered in order.`,
-
   managerChanged: `You have been reassigned to order.`,
-
   commentAdded: `A new comment has been added to order.`,
-
   newOrder: `A new order has been created`,
-
   commentDeleted: `A comment has been deleted from order`,
+  assigned: `You have been assigned to order`,
+  unassigned: `You have been unassigned from order`,
 } as const;

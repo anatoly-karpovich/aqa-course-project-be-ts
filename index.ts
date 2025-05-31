@@ -1,24 +1,26 @@
 import * as dotenv from "dotenv";
 import express from "express";
 import mongoose from "mongoose";
-import productsRouter from "./routers/products.router";
-import customerRouter from "./routers/customer.router";
-import orderRouter from "./routers/order.router";
-import orderStatusRouter from "./routers/orderStatus.router";
-import orderReceiveRouter from "./routers/orderReceive.router";
-import authRouter from "./routers/auth.router";
 import fileUpload from "express-fileupload";
 import swaggerDocs from "./utils/swagger.js";
-import orderDeliveryRouter from "./routers/orderDelivery.router";
 import { errorHandleMiddleware } from "./middleware/errorHandleMiddleware";
 import cors from "cors";
-import orderCommentsRouter from "./routers/orderComments.router";
-import rebatesRouter from "./routers/rebates.router";
-import customerOrdersRouter from "./routers/customer.orders.router";
-import metricsRouter from "./routers/metrics.router";
-import usersRouter from "./routers/users.router";
-import notificationRouter from "./routers/notification.router";
 import { startNotificationCleanup } from "./utils/cron";
+import {
+  authRouter,
+  customerOrdersRouter,
+  customerRouter,
+  notificationRouter,
+  orderCommentsRouter,
+  orderDeliveryRouter,
+  orderReceiveRouter,
+  orderRouter,
+  orderStatusRouter,
+  productsRouter,
+  rebatesRouter,
+  usersRouter,
+  metricsRouter,
+} from "./routers/index.js";
 
 dotenv.config();
 

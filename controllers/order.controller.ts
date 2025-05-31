@@ -93,6 +93,34 @@ class OrderController {
       res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
     }
   }
+
+  async assignManager(req: Request, res: Response) {
+    try {
+      const token = getTokenFromRequest(req);
+      const performerData = getDataDataFromToken(token);
+      const { orderId, managerId } = req.params;
+
+      const order = await OrderService.assignManager(orderId, managerId, performerData.id);
+      res.status(200).json({ Order: order, IsSuccess: true, ErrorMessage: null });
+    } catch (e: any) {
+      console.log(e);
+      res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
+    }
+  }
+
+  async unassignManager(req: Request, res: Response) {
+    try {
+      const token = getTokenFromRequest(req);
+      const performerData = getDataDataFromToken(token);
+      const { orderId } = req.params;
+
+      const order = await OrderService.unassignManager(orderId, performerData.id);
+      res.status(200).json({ Order: order, IsSuccess: true, ErrorMessage: null });
+    } catch (e: any) {
+      console.log(e);
+      res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });
+    }
+  }
 }
 
 export default new OrderController();

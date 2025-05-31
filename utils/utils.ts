@@ -33,6 +33,7 @@ export function createHistoryEntry<T extends Omit<IHistory, "changedOn" | "actio
     total_price: order.total_price,
     changedOn: getTodaysDate(true),
     performer,
+    assignedManager: order.assignedManager,
   };
 }
 
@@ -73,6 +74,16 @@ export function customSort<T extends IProduct | ICustomer | IOrder<ICustomer>>(
 
     if (typeof primaryFieldA === "number" && typeof primaryFieldB === "number") {
       comparison = primaryFieldA - primaryFieldB;
+    } else if (sortField === "assignedManager") {
+      if (primaryFieldA === null) {
+        comparison = 1;
+      } else if (primaryFieldB === null) {
+        comparison = -1;
+      } else {
+        const a = `${primaryFieldA.firstName} ${primaryFieldA.lastName}`;
+        const b = `${primaryFieldB.firstName} ${primaryFieldB.lastName}`;
+        comparison = a.localeCompare(b);
+      }
     } else if (typeof primaryFieldA === "string" && typeof primaryFieldB === "string") {
       comparison = primaryFieldA.localeCompare(primaryFieldB);
     }

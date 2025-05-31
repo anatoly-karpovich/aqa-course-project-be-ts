@@ -45,4 +45,5 @@ export interface IHistory {
   readonly total_price: number;
   readonly changedOn: string;
   readonly performer: IUserWithRoles;
+  readonly assignedManager: IUserWithRoles | null;
 }

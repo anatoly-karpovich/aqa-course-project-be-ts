@@ -3,6 +3,7 @@ import OrderController from "../controllers/order.controller.js";
 import { authmiddleware } from "../middleware/authmiddleware.js";
 import { orderById, orderValidations, orderUpdateValidations } from "../middleware/orderMiddleware.js";
 import { schemaMiddleware } from "../middleware/schemaMiddleware.js";
+import { isManager, managerById } from "../middleware/usersMiddleware.js";
 
 const orderRouter = Router();
 /**
@@ -525,5 +526,106 @@ orderRouter.put(
  *         description: Server error
  */
 orderRouter.delete("/orders/:id", authmiddleware, orderById, OrderController.delete);
+
+/**
+ * @swagger
+ * /api/orders/{orderId}/assign-manager/{managerId}:
+ *   put:
+ *     summary: Assign a manager to an order
+ *     tags: [Orders]
+ *     parameters:
+ *       - in: path
+ *         name: orderId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the order
+ *       - in: path
+ *         name: managerId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the manager to assign
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: Bearer <JWT token>
+ *         description: Bearer token for authentication
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Manager was successfully assigned to the order
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Order'
+ *       400:
+ *         description: Invalid input or manager cannot be assigned
+ *       401:
+ *         description: Unauthorized, missing or invalid token
+ *       403:
+ *         description: Forbidden. The selected user does not have the Manager role
+ *       404:
+ *         description: Order or Manager not found
+ *       409:
+ *         description: Manager already assigned to this order
+ *       500:
+ *         description: Server error
+ */
+
+orderRouter.put(
+  "/orders/:orderId/assign-manager/:managerId",
+  authmiddleware,
+  orderById,
+  managerById,
+  isManager,
+  OrderController.assignManager
+);
+
+/**
+ * @swagger
+ * /api/orders/{orderId}/unassign-manager:
+ *   put:
+ *     summary: Unassign (remove) the manager from an order
+ *     tags: [Orders]
+ *     parameters:
+ *       - in: path
+ *         name: orderId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the order
+ *       - in: header
+ *         name: Authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: Bearer <JWT token>
+ *         description: Bearer token for authentication
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Manager was successfully unassigned from the order
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Order'
+ *       400:
+ *         description: Invalid input or manager cannot be unassigned
+ *       401:
+ *         description: Unauthorized, missing or invalid token
+ *       404:
+ *         description: Order not found
+ *       409:
+ *         description: No manager assigned to this order
+ *       500:
+ *         description: Server error
+ */
+
+orderRouter.put("/orders/:orderId/unassign-manager", authmiddleware, orderById, OrderController.unassignManager);
 
 export default orderRouter;

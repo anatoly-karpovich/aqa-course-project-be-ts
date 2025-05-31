@@ -10,7 +10,9 @@ export type NotificationType =
   | "managerChanged"
   | "commentAdded"
   | "commentDeleted"
-  | "newOrder";
+  | "newOrder"
+  | "unassigned"
+  | "assigned";
 
 export interface INotification extends Document {
   userId: string;

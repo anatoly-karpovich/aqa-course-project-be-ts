@@ -8,7 +8,7 @@ import mongoose, { Types } from "mongoose";
 
 export async function orderById(req: Request, res: Response, next: NextFunction) {
   try {
-    const id = new mongoose.Types.ObjectId(req.params.id);
+    const id = new mongoose.Types.ObjectId(req.params.id || req.params.orderId);
     const order = await OrderService.getOrder(id);
     if (!order) {
       return res.status(404).json({ IsSuccess: false, ErrorMessage: `Order with id '${id}' wasn't found` });

@@ -57,6 +57,7 @@ const history = new mongoose.Schema(
     changedOn: { type: Date, required: true },
     action: { type: String, enum: ORDER_HISTORY_ACTIONS, required: true },
     performer: { type: user, required: true },
+    assignedManager: { type: user, required: false, default: null },
   },
   { _id: false, versionKey: false }
 );
@@ -71,7 +72,7 @@ const Order = new mongoose.Schema(
     createdOn: { type: Date, required: true },
     comments: [{ type: comment, required: false }],
     history: [{ type: history, required: false }],
-    assignedManager: { type: user, required: false },
+    assignedManager: { type: user, required: false, default: null },
   },
   { versionKey: false }
 );

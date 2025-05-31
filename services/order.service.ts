@@ -1,9 +1,9 @@
 import Order from "../models/order.model";
 import CustomerService from "./customer.service";
-import { IOrder, IOrderRequest, ICustomer } from "../data/types";
+import { IOrder, IOrderRequest, ICustomer, IHistory } from "../data/types";
 import type { Types } from "mongoose";
 import { getTotalPrice, createHistoryEntry, productsMapping, getTodaysDate, customSort } from "../utils/utils";
-import { NOTIFICATIONS, ORDER_HISTORY_ACTIONS, ORDER_STATUSES } from "../data/enums";
+import { NOTIFICATIONS, ORDER_HISTORY_ACTIONS, ORDER_STATUSES, ROLES } from "../data/enums";
 import _ from "lodash";
 import mongoose from "mongoose";
 import usersService from "./users.service";
@@ -14,7 +14,7 @@ class OrderService {
 
   async create(order: IOrderRequest, performerdId: string): Promise<IOrder<ICustomer>> {
     const products = await productsMapping(order);
-    const assignedManager = await usersService.getUser(performerdId);
+    const performer = await usersService.getUser(performerdId);
     let action = ORDER_HISTORY_ACTIONS.CREATED;
     const newOrder: IOrder<string> = {
       status: ORDER_STATUSES.DRAFT,
@@ -25,13 +25,13 @@ class OrderService {
       createdOn: getTodaysDate(true),
       history: [],
       comments: [],
-      assignedManager,
+      assignedManager: null,
     };
-    newOrder.history.unshift(createHistoryEntry(newOrder, action, assignedManager));
+    newOrder.history.unshift(createHistoryEntry(newOrder, action, performer));
     const createdOrder = await Order.create(newOrder);
     const customer = await CustomerService.getCustomer(createdOrder.customer);
 
-    return { ...createdOrder._doc, customer, assignedManager };
+    return { ...createdOrder._doc, customer };
   }
 
   async getAll(): Promise<IOrder<ICustomer>[]> {
@@ -197,6 +197,72 @@ class OrderService {
     const orders = await Order.find({ "assignedManager._id": new mongoose.Types.ObjectId(managerId) });
 
     return orders;
+  }
+
+  // Назначить менеджера
+  async assignManager(orderId: string, managerId: string, performerId: string) {
+    const manager = await usersService.getUser(managerId);
+    const order = await Order.findById(orderId);
+    order.assignedManager = manager;
+
+    // performer — это кто выполняет действие
+    const performer = await usersService.getUser(performerId);
+
+    // Добавить запись в history
+    order.history.unshift(
+      createHistoryEntry(
+        order as unknown as Omit<IHistory, "changedOn" | "action" | "performer">,
+        ORDER_HISTORY_ACTIONS.MANAGER_ASSIGNED,
+        performer
+      )
+    );
+
+    await order.save();
+
+    await this.notificationService.create({
+      userId: order.assignedManager._id.toString(),
+      orderId: order._id.toString(),
+      type: "assigned",
+      message: NOTIFICATIONS.assigned,
+    });
+    const customer = await CustomerService.getCustomer(order.customer);
+
+    return { ...order._doc, customer, assignedManager: manager };
+  }
+
+  // Снять менеджера
+  async unassignManager(orderId: string, performerId: string) {
+    const order = await Order.findById(orderId);
+    if (!order) throw new Error("Order not found");
+
+    const previousAssignee = order.assignedManager;
+    order.assignedManager = null;
+
+    const performer = await usersService.getUser(performerId);
+
+    if (previousAssignee) {
+      order.history.unshift(
+        createHistoryEntry(
+          order as unknown as Omit<IHistory, "changedOn" | "action" | "performer">,
+          ORDER_HISTORY_ACTIONS.MANAGER_UNASSIGNED,
+          performer
+        )
+      );
+    }
+
+    await order.save();
+
+    if (previousAssignee) {
+      await this.notificationService.create({
+        userId: previousAssignee._id.toString(),
+        orderId: order._id.toString(),
+        type: "unassigned",
+        message: NOTIFICATIONS.unassigned,
+      });
+    }
+    const customer = await CustomerService.getCustomer(order.customer);
+
+    return { ...order._doc, customer, assignedManager: null };
   }
 }
 
