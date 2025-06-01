@@ -18,8 +18,13 @@ export class NotificationService {
 
   async create({ userId, type, orderId, message }: Pick<INotification, "userId" | "type" | "orderId" | "message">) {
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 1 день
-    NotificationService.sendToUser(userId, { userId, type, orderId, message, expiresAt });
-    return await this.Notification.create({ userId, type, orderId, message, expiresAt });
+    const result = await this.Notification.create({ userId, type, orderId, message, expiresAt });
+    const notifications = await this.getNotifications(userId);
+    NotificationService.sendToUser(userId, {
+      message,
+      unreadAmount: notifications.filter((n) => !n.read).length,
+    });
+    return result;
   }
 
   async getNotifications(userId: string) {

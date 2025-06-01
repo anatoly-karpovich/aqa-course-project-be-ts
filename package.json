@@ -27,7 +27,7 @@
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "mongoose": "^6.8.3",
-    "node-cron": "^4.0.7",
+    "node-cron": "^3.0.2",
     "rimraf": "^4.0.7",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
