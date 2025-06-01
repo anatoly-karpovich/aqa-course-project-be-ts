@@ -73,6 +73,7 @@ export enum ORDER_HISTORY_ACTIONS {
   CANCELED = "Order canceled",
   MANAGER_ASSIGNED = "Manager Assigned",
   MANAGER_UNASSIGNED = "Manager Unassigned",
+  REOPENED = "Order reopened",
 }
 
 export const NOTIFICATIONS = {

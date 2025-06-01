@@ -25,6 +25,10 @@ class OrderStatusService {
     let action: ORDER_HISTORY_ACTIONS;
     if (status === ORDER_STATUSES.IN_PROCESS) action = ORDER_HISTORY_ACTIONS.PROCESSED;
     if (status === ORDER_STATUSES.CANCELED) action = ORDER_HISTORY_ACTIONS.CANCELED;
+    if (status === ORDER_STATUSES.DRAFT) {
+      action = ORDER_HISTORY_ACTIONS.REOPENED;
+      newOrder.delivery = null;
+    }
 
     newOrder.history.unshift(createHistoryEntry(newOrder, action, manager));
     const updatedOrder = await Order.findByIdAndUpdate(newOrder._id, newOrder, { new: true });

@@ -56,7 +56,7 @@ export async function orderStatus(req: Request, res: Response, next: NextFunctio
     if (!Object.values(ORDER_STATUSES).includes(status)) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: `Invalid order status` });
     }
-    if (status !== "In Process" && status !== "Canceled") {
+    if (status !== ORDER_STATUSES.IN_PROCESS && status !== ORDER_STATUSES.CANCELED && status !== ORDER_STATUSES.DRAFT) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: `Invalid order status` });
     }
     const id = req.body._id || req.params.id;
@@ -64,15 +64,29 @@ export async function orderStatus(req: Request, res: Response, next: NextFunctio
     if (!order) {
       return res.status(404).json({ IsSuccess: false, ErrorMessage: `Order with id '${id}' wasn't found` });
     }
-    if (status === "In Process" && order.status !== "Draft" && order.status !== "In Process") {
-      return res.status(400).json({ IsSuccess: false, ErrorMessage: `Invalid order status` });
-    }
-    if (status === "Canceled" && order.status !== "Draft" && order.status !== "In Process") {
+
+    if (
+      status === ORDER_STATUSES.IN_PROCESS &&
+      order.status !== ORDER_STATUSES.DRAFT &&
+      order.status !== ORDER_STATUSES.IN_PROCESS
+    ) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: `Invalid order status` });
     }
 
-    if (status === "In Process" && !order.delivery) {
+    if (
+      status === ORDER_STATUSES.CANCELED &&
+      order.status !== ORDER_STATUSES.DRAFT &&
+      order.status !== ORDER_STATUSES.IN_PROCESS
+    ) {
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: `Invalid order status` });
+    }
+
+    if (status === ORDER_STATUSES.IN_PROCESS && !order.delivery) {
       return res.status(400).json({ IsSuccess: false, ErrorMessage: `Can't process order. Please, schedule delivery` });
+    }
+
+    if (status === ORDER_STATUSES.DRAFT && order.status !== ORDER_STATUSES.CANCELED) {
+      return res.status(400).json({ IsSuccess: false, ErrorMessage: `Can't reopen not canceled order` });
     }
     next();
   } catch (e: any) {
