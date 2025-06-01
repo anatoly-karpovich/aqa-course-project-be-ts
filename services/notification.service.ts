@@ -1,10 +1,24 @@
+import { Server } from "socket.io";
 import { INotification } from "../data/types/notification.types";
 import notificationModel from "../models/notification.model";
 
 export class NotificationService {
   private Notification = notificationModel;
+  private static io: null | Server = null;
+
+  static setSocketIO(io: Server) {
+    NotificationService.io = io;
+  }
+
+  static sendToUser(userId: string, data: any) {
+    if (NotificationService.io) {
+      NotificationService.io.to(userId).emit("new_notification", data);
+    }
+  }
+
   async create({ userId, type, orderId, message }: Pick<INotification, "userId" | "type" | "orderId" | "message">) {
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 1 день
+    NotificationService.sendToUser(userId, { userId, type, orderId, message, expiresAt });
     return await this.Notification.create({ userId, type, orderId, message, expiresAt });
   }
 

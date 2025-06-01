@@ -1,5 +1,7 @@
 import * as dotenv from "dotenv";
 import express from "express";
+import http from "http";
+import initSocketIO from "./ws/socket";
 import mongoose from "mongoose";
 import fileUpload from "express-fileupload";
 import swaggerDocs from "./utils/swagger.js";
@@ -64,7 +66,9 @@ app.use(errorHandleMiddleware);
 async function startApp() {
   try {
     mongoose.connect(DB_URL, {});
-    app.listen(PORT, () => {
+    const server = http.createServer(app);
+    initSocketIO(server);
+    server.listen(PORT, () => {
       console.log("Server started on port " + PORT);
     });
     swaggerDocs(app);
