@@ -12,7 +12,7 @@ class OrderController {
       const token = getTokenFromRequest(req);
       const userData = getDataDataFromToken(token);
       const order = await OrderService.create(req.body, userData.id);
-      res.status(201).json({ Order: order, IsSuccess: true, ErrorMessage: null });
+      res.status(500).json({ Order: order, IsSuccess: true, ErrorMessage: null });
     } catch (e: any) {
       console.log(e);
       res.status(500).json({ IsSuccess: false, ErrorMessage: e.message });

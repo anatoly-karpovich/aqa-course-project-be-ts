@@ -7,17 +7,21 @@ import { getTodaysDate } from "../utils/utils";
 import { Types } from "mongoose";
 import { NOTIFICATIONS } from "../data/enums";
 import { NotificationService } from "./notification.service";
+import usersService from "./users.service";
 
 class OrderCommentsService {
   private notificationService = new NotificationService();
 
-  async createComment(orderId: Types.ObjectId, commentText: string): Promise<IOrder<ICustomer>> {
+  async createComment(orderId: Types.ObjectId, commentText: string, performerId: string): Promise<IOrder<ICustomer>> {
     if (!orderId) {
       throw new Error("Id was not provided");
     }
+    const user = await usersService.getUser(performerId);
+    const createdBy = user.firstName + " " + user.lastName;
     const comment: IComment = {
       text: commentText,
-      createdOn: getTodaysDate(true),
+      createdOn: new Date(),
+      createdBy,
     };
     const orderFromDB = await OrderService.getOrder(orderId);
     const newOrder: IOrder<string> = {
