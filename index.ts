@@ -23,16 +23,12 @@ import {
   usersRouter,
   metricsRouter,
 } from "./routers/index.js";
+import { seed } from "./mongo/init";
+import { getDbUrl } from "./mongo/url";
 
 dotenv.config();
 
-const DB_URL = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.j9uiirp.mongodb.net/?retryWrites=true&w=majority`;
-
-const PORT = +process.env.PORT;
-
 const app = express();
-
-const BASE_URL = process.env.ENVIRONMENT;
 
 const cors_options: cors.CorsOptions = {
   // origin: ["http://127.0.0.1:5502", "https://anatoly-karpovich.github.io"],
@@ -64,8 +60,11 @@ app.use("/api", notificationRouter);
 app.use(errorHandleMiddleware);
 
 async function startApp() {
+  const DB_URL = getDbUrl();
+  const PORT = +process.env.PORT;
   try {
     mongoose.connect(DB_URL, {});
+    await seed();
     const server = http.createServer(app);
     initSocketIO(server);
     server.listen(PORT, () => {
