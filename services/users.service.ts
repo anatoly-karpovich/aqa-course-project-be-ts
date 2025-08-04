@@ -28,6 +28,10 @@ class UsersService {
     return user ? _.omit(user.toObject(), ["password"]) : null;
   }
 
+  async getAdmin() {
+    return await User.findOne({ role: ROLES.ADMIN });
+  }
+
   async getUserByUsername(username: string) {
     const user = await User.findOne({ username });
     return user ? _.omit(user.toObject(), ["password"]) : null;
